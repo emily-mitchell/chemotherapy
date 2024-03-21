@@ -1,0 +1,398 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# "ms44 filters for PX007_1"   94 samples
+# Author: Emily Mitchell
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------
+------------------------------------------------------------------------------------------
+# 1a. Run script for filtering caveman output from low input pipeline
+	farm5 login
+        /lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Lists of sample and project names created in excel ms44_filter_set_up
+# Run on cgpbar using nohup &
+#-pt: Comma-separated list of project identifiers containing the samples of interest
+#-st: Comma-separated list of sample identifiers whose presence is required in the matched project directories listed under –pt
+#-pn: Comma-separated list of project identifiers containing the matched control samples
+#-sn: Comma-separated list of sample identifiers of control samples whose presence is required in the matched project directories listed under -pn
+#-o: Output directory
+
+# See other options /lustre/scratch116/casm/cgp/users/ms44/scripts/runLCMFiltering_by_sample_project.sh --help (assume data aligned to hg19)
+# If coverage low (~15) might be best to lower the variant fragment threshold to 3 through the parameter -f (default:4).
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Run Mathijs filter  (200622)
+/lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+module load samtools
+
+python /lustre/scratch126/casm/team273jn/share/runlcmfilter_multi_nst.py --project 2919 --samples  PD37580a_lo0002,PD37580a_lo0003,PD37580a_lo0004,PD37580a_lo0005,PD37580a_lo0006,PD37580a_lo0007,PD37580a_lo0008,PD37580a_lo0009,PD37580a_lo0010,PD37580a_lo0011,PD37580a_lo0012,PD37580a_lo0013,PD37580a_lo0014,PD37580a_lo0015,PD37580a_lo0016,PD37580a_lo0017,PD37580a_lo0019,PD37580a_lo0020,PD37580a_lo0021,PD37580a_lo0022,PD37580a_lo0025,PD37580a_lo0026,PD37580a_lo0027,PD37580a_lo0028,PD37580a_lo0030,PD37580a_lo0032,PD37580a_lo0033,PD37580a_lo0034,PD37580a_lo0035,PD37580a_lo0036,PD37580a_lo0037,PD37580a_lo0038,PD37580a_lo0039,PD37580a_lo0040,PD37580a_lo0041,PD37580a_lo0042,PD37580a_lo0043,PD37580a_lo0044,PD37580a_lo0045,PD37580a_lo0046,PD37580a_lo0047,PD37580a_lo0048,PD37580a_lo0049,PD37580a_lo0050,PD37580a_lo0051,PD37580a_lo0052,PD37580a_lo0053,PD37580a_lo0054,PD37580a_lo0055,PD37580a_lo0056,PD37580a_lo0057,PD37580a_lo0058,PD37580a_lo0059,PD37580a_lo0060,PD37580a_lo0061,PD37580a_lo0062,PD37580a_lo0063,PD37580a_lo0064,PD37580a_lo0065,PD37580a_lo0066,PD37580a_lo0067,PD37580a_lo0068,PD37580a_lo0069,PD37580a_lo0070,PD37580a_lo0071,PD37580a_lo0072,PD37580a_lo0073,PD37580a_lo0074,PD37580a_lo0075,PD37580a_lo0076,PD37580a_lo0077,PD37580a_lo0078,PD37580a_lo0079,PD37580a_lo0080,PD37580a_lo0081,PD37580a_lo0082,PD37580a_lo0083,PD37580a_lo0084,PD37580a_lo0085,PD37580a_lo0086,PD37580a_lo0087,PD37580a_lo0088,PD37580a_lo0089,PD37580a_lo0090,PD37580a_lo0091,PD37580a_lo0092,PD37580a_lo0093,PD37580a_lo0094,PD37580a_lo0095,PD37580a_lo0096,PD37580a_lo0097,PD37580a_lo0098,PD37580a_lo0100,PD37580a_lo0101 --outdir /lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs/ --build hg19 --fragment_threshold 3
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 2. Check number of lines in the complete_final_retained_3.vcf files (131221)
+/lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+wc -l *complete_final_retained_3.vcf
+
+     37611 PD37580a_lo0002_complete_final_retained_3.vcf
+     31032 PD37580a_lo0003_complete_final_retained_3.vcf
+     35760 PD37580a_lo0004_complete_final_retained_3.vcf
+     36163 PD37580a_lo0005_complete_final_retained_3.vcf
+     39803 PD37580a_lo0006_complete_final_retained_3.vcf
+     34996 PD37580a_lo0007_complete_final_retained_3.vcf
+     32399 PD37580a_lo0008_complete_final_retained_3.vcf
+     34914 PD37580a_lo0009_complete_final_retained_3.vcf
+     33656 PD37580a_lo0010_complete_final_retained_3.vcf
+     38711 PD37580a_lo0011_complete_final_retained_3.vcf
+     31332 PD37580a_lo0012_complete_final_retained_3.vcf
+     36872 PD37580a_lo0013_complete_final_retained_3.vcf
+     24686 PD37580a_lo0014_complete_final_retained_3.vcf
+     34764 PD37580a_lo0015_complete_final_retained_3.vcf
+     40616 PD37580a_lo0016_complete_final_retained_3.vcf
+     32615 PD37580a_lo0017_complete_final_retained_3.vcf
+     41307 PD37580a_lo0019_complete_final_retained_3.vcf
+     33969 PD37580a_lo0020_complete_final_retained_3.vcf
+     37592 PD37580a_lo0021_complete_final_retained_3.vcf
+     37019 PD37580a_lo0022_complete_final_retained_3.vcf
+     36401 PD37580a_lo0025_complete_final_retained_3.vcf
+     35564 PD37580a_lo0026_complete_final_retained_3.vcf
+     39061 PD37580a_lo0027_complete_final_retained_3.vcf
+     37511 PD37580a_lo0028_complete_final_retained_3.vcf
+     37881 PD37580a_lo0030_complete_final_retained_3.vcf
+     29271 PD37580a_lo0032_complete_final_retained_3.vcf
+     36940 PD37580a_lo0033_complete_final_retained_3.vcf
+     40172 PD37580a_lo0034_complete_final_retained_3.vcf
+     35255 PD37580a_lo0035_complete_final_retained_3.vcf
+     35042 PD37580a_lo0036_complete_final_retained_3.vcf
+     38386 PD37580a_lo0037_complete_final_retained_3.vcf
+     33150 PD37580a_lo0038_complete_final_retained_3.vcf
+     36353 PD37580a_lo0039_complete_final_retained_3.vcf
+     36983 PD37580a_lo0040_complete_final_retained_3.vcf
+     37187 PD37580a_lo0041_complete_final_retained_3.vcf
+     34958 PD37580a_lo0042_complete_final_retained_3.vcf
+     34389 PD37580a_lo0043_complete_final_retained_3.vcf
+     38574 PD37580a_lo0044_complete_final_retained_3.vcf
+     36758 PD37580a_lo0045_complete_final_retained_3.vcf
+     35698 PD37580a_lo0046_complete_final_retained_3.vcf
+     38180 PD37580a_lo0047_complete_final_retained_3.vcf
+     40695 PD37580a_lo0048_complete_final_retained_3.vcf
+     43190 PD37580a_lo0049_complete_final_retained_3.vcf
+     35945 PD37580a_lo0050_complete_final_retained_3.vcf
+     35936 PD37580a_lo0051_complete_final_retained_3.vcf
+     37576 PD37580a_lo0052_complete_final_retained_3.vcf
+     37463 PD37580a_lo0053_complete_final_retained_3.vcf
+     36929 PD37580a_lo0054_complete_final_retained_3.vcf
+     36712 PD37580a_lo0055_complete_final_retained_3.vcf
+     36609 PD37580a_lo0056_complete_final_retained_3.vcf
+     38054 PD37580a_lo0057_complete_final_retained_3.vcf
+     34017 PD37580a_lo0058_complete_final_retained_3.vcf
+     37492 PD37580a_lo0059_complete_final_retained_3.vcf
+     41608 PD37580a_lo0060_complete_final_retained_3.vcf
+     36986 PD37580a_lo0061_complete_final_retained_3.vcf
+     38303 PD37580a_lo0062_complete_final_retained_3.vcf
+     40204 PD37580a_lo0063_complete_final_retained_3.vcf
+     35714 PD37580a_lo0064_complete_final_retained_3.vcf
+     43255 PD37580a_lo0065_complete_final_retained_3.vcf
+     37386 PD37580a_lo0066_complete_final_retained_3.vcf
+     33278 PD37580a_lo0067_complete_final_retained_3.vcf
+     38712 PD37580a_lo0068_complete_final_retained_3.vcf
+     37630 PD37580a_lo0069_complete_final_retained_3.vcf
+     35726 PD37580a_lo0070_complete_final_retained_3.vcf
+     36062 PD37580a_lo0071_complete_final_retained_3.vcf
+     36102 PD37580a_lo0072_complete_final_retained_3.vcf
+     36194 PD37580a_lo0073_complete_final_retained_3.vcf
+     15564 PD37580a_lo0074_complete_final_retained_3.vcf
+     36153 PD37580a_lo0075_complete_final_retained_3.vcf
+     36753 PD37580a_lo0076_complete_final_retained_3.vcf
+     32167 PD37580a_lo0077_complete_final_retained_3.vcf
+     36017 PD37580a_lo0078_complete_final_retained_3.vcf
+     38075 PD37580a_lo0079_complete_final_retained_3.vcf
+     34545 PD37580a_lo0080_complete_final_retained_3.vcf
+     34853 PD37580a_lo0081_complete_final_retained_3.vcf
+     35534 PD37580a_lo0082_complete_final_retained_3.vcf
+     31882 PD37580a_lo0083_complete_final_retained_3.vcf
+     34617 PD37580a_lo0084_complete_final_retained_3.vcf
+     35232 PD37580a_lo0085_complete_final_retained_3.vcf
+     35705 PD37580a_lo0086_complete_final_retained_3.vcf
+     37693 PD37580a_lo0087_complete_final_retained_3.vcf
+     36265 PD37580a_lo0088_complete_final_retained_3.vcf
+     34342 PD37580a_lo0089_complete_final_retained_3.vcf
+     32425 PD37580a_lo0090_complete_final_retained_3.vcf
+     43497 PD37580a_lo0091_complete_final_retained_3.vcf
+     29379 PD37580a_lo0092_complete_final_retained_3.vcf
+     33414 PD37580a_lo0093_complete_final_retained_3.vcf
+     38666 PD37580a_lo0094_complete_final_retained_3.vcf
+     36117 PD37580a_lo0095_complete_final_retained_3.vcf
+     38170 PD37580a_lo0096_complete_final_retained_3.vcf
+     38720 PD37580a_lo0097_complete_final_retained_3.vcf
+     36426 PD37580a_lo0098_complete_final_retained_3.vcf
+     35164 PD37580a_lo0100_complete_final_retained_3.vcf
+     37990 PD37580a_lo0101_complete_final_retained_3.vcf
+   3392674 total
+                       
+94 samples
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 3. Get one long bed file of all the subs, copy to new directory, create output file
+
+/lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+cut -f 1,2,4,5 *complete_final_retained_3.vcf | sort | uniq > PX007_1_filtered_subs.bed
+grep -v "#" PX007_1_filtered_subs.bed > PX007_1_filtered_subs_no#.bed # remove lines starting with "#"
+mv PX007_1_filtered_subs_no#.bed PX007_1_3_filtered_subs.bed
+
+#532301 PX007_1_3_filtered_subs.bed
+
+mkdir output
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 4. Run cgpVAF script to create cgpVAF commands that are split per chromosome  (131221)
+        On cgp-farm
+        /lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs/
+        Creates: cgpVafChr.cmd (commands split per chr) cgpVafCAAat.cmd (commands to cAAatenate split output) run_bsub.sh (script to set off commands in first two files)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+module load cgpVAFcommand
+
+createVafCmd.pl -pid 2919 -u PD37580a_lo0002 PD37580a_lo0003 PD37580a_lo0004 PD37580a_lo0005 PD37580a_lo0006 PD37580a_lo0007 PD37580a_lo0008 PD37580a_lo0009 PD37580a_lo0010 PD37580a_lo0011 PD37580a_lo0012 PD37580a_lo0013 PD37580a_lo0014 PD37580a_lo0015 PD37580a_lo0016 PD37580a_lo0017 PD37580a_lo0019 PD37580a_lo0020 PD37580a_lo0021 PD37580a_lo0022 PD37580a_lo0025 PD37580a_lo0026 PD37580a_lo0027 PD37580a_lo0028 PD37580a_lo0030 PD37580a_lo0032 PD37580a_lo0033 PD37580a_lo0034 PD37580a_lo0035 PD37580a_lo0036 PD37580a_lo0037 PD37580a_lo0038 PD37580a_lo0039 PD37580a_lo0040 PD37580a_lo0041 PD37580a_lo0042 PD37580a_lo0043 PD37580a_lo0044 PD37580a_lo0045 PD37580a_lo0046 PD37580a_lo0047 PD37580a_lo0048 PD37580a_lo0049 PD37580a_lo0050 PD37580a_lo0051 PD37580a_lo0052 PD37580a_lo0053 PD37580a_lo0054 PD37580a_lo0055 PD37580a_lo0056 PD37580a_lo0057 PD37580a_lo0058 PD37580a_lo0059 PD37580a_lo0060 PD37580a_lo0061 PD37580a_lo0062 PD37580a_lo0063 PD37580a_lo0064 PD37580a_lo0065 PD37580a_lo0066 PD37580a_lo0067 PD37580a_lo0068 PD37580a_lo0069 PD37580a_lo0070 PD37580a_lo0071 PD37580a_lo0072 PD37580a_lo0073 PD37580a_lo0074 PD37580a_lo0075 PD37580a_lo0076 PD37580a_lo0077 PD37580a_lo0078 PD37580a_lo0079 PD37580a_lo0080 PD37580a_lo0081 PD37580a_lo0082 PD37580a_lo0083 PD37580a_lo0084 PD37580a_lo0085 PD37580a_lo0086 PD37580a_lo0087 PD37580a_lo0088 PD37580a_lo0089 PD37580a_lo0090 PD37580a_lo0091 PD37580a_lo0092 PD37580a_lo0093 PD37580a_lo0094 PD37580a_lo0095 PD37580a_lo0096 PD37580a_lo0097 PD37580a_lo0098 PD37580a_lo0100 PD37580a_lo0101 -o output -g /lustre/scratch119/casm/team78pipelines/reference/human/GRCh37d5/genome.fa -hdr /lustre/scratch119/casm/team78pipelines/reference/human/GRCh37d5/shared/ucscHiDepth_0.01_mrg1000_no_exon_coreChrs.bed.gz -mq 30  -bo 1  -b PX007_1_3_filtered_subs.bed
+                                               
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 5. Modify config.ini file (in output directory) to have approx 10 bams per job (splits by bams as well as by chr) See below for example structure
+	/lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs/output/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+[2919]
+PDv37is_UNM1= <<EOT
+PD37580f
+PD37580g
+PD37580i
+PD37580k
+PD37580n
+PD37580p
+PD37580q
+PD37580s
+PD37580t
+PD37580u
+EOT
+PDv37is_UNM2= <<EOT
+PD37580v
+PD37580x
+PD37580z
+PD37580ab
+PD37580ac
+PD37580ad
+PD37580ae
+PD37580af
+PD37580ag
+PD37580ah
+EOT
+PDv37is_UNM3= <<EOT
+PD37580ai
+PD37580aj
+PD37580ak
+PD37580am
+PD37580ao
+PD37580ap
+PD37580aq
+PD37580az
+PD37580ba
+PD37580bb
+EOT
+PDv37is_UNM4= <<EOT
+PD37580bc
+PD37580bd
+PD37580be
+PD37580bf
+PD37580bg
+PD37580bi
+PD37580ar
+PD37580bj
+PD37580bk
+PD37580bl
+EOT
+PDv37is_UNM5= <<EOT
+PD37580bm
+PD37580bn
+PD37580as
+PD37580at
+PD37580au
+PD37580av
+PD37580aw
+PD37580ax
+PD37580ay
+EOT
+
+[UserData]
+bedfile=PX007_1_3_filtered_subs.bed
+
+[genome_build]
+genome=human
+build=GRCh37d5
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 6. Save .ini file as 2919_cgpVafConfig.ini and run following command to create amended split commands  
+
+/lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+createVafCmd.pl -pid 2919 -o output -i output/2919_cgpVafConfig.ini -g /lustre/scratch119/casm/team78pipelines/reference/human/GRCh37d5/genome.fa -hdr /lustre/scratch119/casm/team78pipelines/reference/human/GRCh37d5/shared/ucscHiDepth_0.01_mrg1000_no_exon_coreChrs.bed.gz -mq 30  -bo 1  -b PX007_1_3_filtered_subs.bed
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 7. Edit run_bsub.sh command to increase memory and use long queue
+            run_bsub.sh command sets off jobs in cgpVafChr.cmd file that has been created
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+set -e;
+set -o pipefail;
+
+JID=`uuidgen`
+bsub -oo cgpvaf%I.log -q long -J "$JID[1-888]%25" -n 1 -R 'select[mem>=4000] span[hosts=1] rusage[mem=4000]' -M4000 '/software/CASM/modules/installs/cgpVAFcommand/cgpVAFcommand-2.4.0/perl/bin/farm_idx_exec.pl cgpVafChr.cmd $LSB_JOBINDEX'
+
+bsub -w "done($JID)||exit($JID)" -oo cAAat%I.log -q normal -J 'batchjobs[1-37]%37' -n 1 -R 'select[mem>=2000] span[hosts=1] rusage[mem=2000]' -M2000 '/software/CASM/modules/installs/cgpVAFcommand/cgpVAFcommand-2.4.0/perl/bin/farm_idx_exec.pl cgpVafCAAat.cmd $LSB_JOBINDEX'
+                                
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 8. Run run_bsub.sh command
+	/lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bash run_bsub.sh
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 9. Check output /lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs/output/output/PDv37is/snp
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+PDv37is_PD37580a_lo0005_snp_vaf.tsv	    PDv37is_PD37580a_lo0059_snp_vaf.tsv
+PDv37is_PD37580a_lo0005_snp_vaf.vcf	    PDv37is_PD37580a_lo0059_snp_vaf.vcf
+PDv37is_PD37580a_lo0005_snp_vaf.vcf.gz	    PDv37is_PD37580a_lo0059_snp_vaf.vcf.gz
+PDv37is_PD37580a_lo0005_snp_vaf.vcf.gz.tbi  PDv37is_PD37580a_lo0059_snp_vaf.vcf.gz.tbi
+PDv37is_PD37580a_lo0010_snp_vaf.tsv	    PDv37is_PD37580a_lo0068_snp_vaf.tsv
+PDv37is_PD37580a_lo0010_snp_vaf.vcf	    PDv37is_PD37580a_lo0068_snp_vaf.vcf
+PDv37is_PD37580a_lo0010_snp_vaf.vcf.gz	    PDv37is_PD37580a_lo0068_snp_vaf.vcf.gz
+PDv37is_PD37580a_lo0010_snp_vaf.vcf.gz.tbi  PDv37is_PD37580a_lo0068_snp_vaf.vcf.gz.tbi
+PDv37is_PD37580a_lo0019_snp_vaf.tsv	    PDv37is_PD37580a_lo0077_snp_vaf.tsv
+PDv37is_PD37580a_lo0019_snp_vaf.vcf	    PDv37is_PD37580a_lo0077_snp_vaf.vcf
+PDv37is_PD37580a_lo0019_snp_vaf.vcf.gz	    PDv37is_PD37580a_lo0077_snp_vaf.vcf.gz
+PDv37is_PD37580a_lo0019_snp_vaf.vcf.gz.tbi  PDv37is_PD37580a_lo0077_snp_vaf.vcf.gz.tbi
+PDv37is_PD37580a_lo0030_snp_vaf.tsv	    PDv37is_PD37580a_lo0086_snp_vaf.tsv
+PDv37is_PD37580a_lo0030_snp_vaf.vcf	    PDv37is_PD37580a_lo0086_snp_vaf.vcf
+PDv37is_PD37580a_lo0030_snp_vaf.vcf.gz	    PDv37is_PD37580a_lo0086_snp_vaf.vcf.gz
+PDv37is_PD37580a_lo0030_snp_vaf.vcf.gz.tbi  PDv37is_PD37580a_lo0086_snp_vaf.vcf.gz.tbi
+PDv37is_PD37580a_lo0040_snp_vaf.tsv	    PDv37is_PD37580a_lo0095_snp_vaf.tsv
+PDv37is_PD37580a_lo0040_snp_vaf.vcf	    PDv37is_PD37580a_lo0095_snp_vaf.vcf
+PDv37is_PD37580a_lo0040_snp_vaf.vcf.gz	    PDv37is_PD37580a_lo0095_snp_vaf.vcf.gz
+PDv37is_PD37580a_lo0040_snp_vaf.vcf.gz.tbi  PDv37is_PD37580a_lo0095_snp_vaf.vcf.gz.tbi
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 10.  Remove extra lines in headers of vaf.tsv files with more than 10 bam files
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Ensure headers are the same length
+wc -l *_vaf.tsv
+
+    532360 PDv37is_PD37580a_lo0005_snp_vaf.tsv
+    532360 PDv37is_PD37580a_lo0010_snp_vaf.tsv
+    532360 PDv37is_PD37580a_lo0019_snp_vaf.tsv
+    532360 PDv37is_PD37580a_lo0030_snp_vaf.tsv
+    532360 PDv37is_PD37580a_lo0040_snp_vaf.tsv
+    532360 PDv37is_PD37580a_lo0059_snp_vaf.tsv
+    532360 PDv37is_PD37580a_lo0068_snp_vaf.tsv
+    532360 PDv37is_PD37580a_lo0077_snp_vaf.tsv
+    532360 PDv37is_PD37580a_lo0086_snp_vaf.tsv
+    532354 PDv37is_PD37580a_lo0095_snp_vaf.tsv
+   5323594 total
+
+ls *_vaf.tsv > files
+
+for i in {1..10}
+do grep -v "##" $(sed -n $i'p' files) > tsv$i
+done
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 11. Cut columns of interest to new files: Chrom Pos Ref Alt then MTR DEP for all samples (150921)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Create list of files of interest in list saved as 'files'
+ls tsv* > tsv_files
+
+#for first file
+cut -f 3,4,5,6,39,41,54,56,69,71,84,86,99,101,114,116,129,131,144,146,159,161,174,176,189,191,204,206 $(sed -n '1p' tsv_files) > output1   #Chr, Pos, Ref, Alt, + MTR, DEP for all samples (max 12 samples in one file)
+
+#for subsequent files (exclude Chr, Pos, Ref, Alt and PDv37is)
+for i in {2..10}
+do
+cut -f 39,41,54,56,69,71,84,86,99,101,114,116,129,131,144,146,159,161,174,176,189,191,204,206 $(sed -n $i'p' tsv_files) >  output$i
+done
+
+
+#Conatenate output files to one merged file
+
+paste output* > PX007_1_filtered_3_merged_cut.tsv
+
+#532302 PX007_1_filtered_3_merged_cut.tsv
+
+#Copy file to local drive
+
+scp -r farm5-login:/lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs/output/output/PDv37is/snp/PX007_1_filtered_3_merged_cut.tsv /Users/em16/Documents/PhD/Sequencing_results/DNA_seq/PX007/PX007_1/subs/
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#Filtering step 1
+
+PX007_1/subs/filtering
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Scripts saved in /lustre/scratch126/casm/team154pc/em16/R_scripts
+# R version 3.6.1
+
+mkdir output
+
+export PATH=/software/R-3.6.1/bin:${PATH}
+export R_HOME=$(R RHOME)
+export R_LIBS_USER="/nfs/users/nfs_e/em16/R/x86_64-pc-linux-gnu-library/3.6"
+
+bsub -o $PWD/log.%J -e $PWD/err.%J -q long -R 'select[mem>=16000] span[hosts=1] rusage[mem=16000]' -M16000 -n6 -J PX007_1 /lustre/scratch126/casm/team154pc/em16/R_scripts/mutation_filtering_get_parameters.R -r PX007_1_01 -s /lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs/output/output/PDv37is/snp/PX007_1_filtered_3_merged_cut.tsv -i /lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/indels/output/output/PDv37is/indel/PX007_1_indel_filtered_merged_cut.tsv -o /lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs/filtering/output
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#Filtering step 2
+
+/lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/trees/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Ensure trees folder exists and copy mats_and_params file there
+# create PX007_1_filtering_from_table_tree_f5.R script in trees folder (trees/vaf/PX007_1_filtering_from_table_tree_f5.R)
+# run bsub command
+
+module load vagrent
+export PATH=/software/R-3.6.1/bin:${PATH}
+export R_HOME=$(R RHOME)
+export R_LIBS_USER="/nfs/users/nfs_e/em16/R/x86_64-pc-linux-gnu-library/3.6"
+
+RUNID='PX007_1'
+OUTPUT='/lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/trees/'
+MEM=30000
+QUEUE=long
+CORES=1
+
+bsub -J"${RUNID}" -M${MEM} -R"select[mem>${MEM}] rusage[mem=${MEM}] span[hosts=1]" -n ${CORES} -q ${QUEUE} -e %J.stderr -o %J.stdout \
+"xvfb-run -a Rscript --no-save --no-restore --verbose ./PX007_1_filtering_from_table_tree_f5.R ${RUNID} ${OUTPUT} > PX007_1_filtering_from_table_tree_f5.Rout 2>&1"
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#Sensitivity analysis (241120)
+/lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/sensitivity/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/lustre/scratch126/casm/team154pc/em16/R_scripts/Sensitivity_analysis_from_SNPs.R -m /lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/trees/mats_and_params_PX007_1_01 -o /lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/sensitivity/ -n PX007_1_sensitivity -i /lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/indels -s /lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,360 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# "ms44 filters for PX007_1_indels" 94 samples
+# Author: Emily Mitchell
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/lustre/scratch117/casm/team154/em16/PX007/PX007_1/indels/
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#1.  Copy in pindel files
+/lustre/scratch117/casm/team154/em16/PX007/PX007_1/indels/	
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+nohup cp /nfs/cancer_ref01/nst_links/live/2919/*/PD37580*pindel.annot.vcf.gz . &
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#2. Unzip the pindel files.
+/lustre/scratch117/casm/team154/em16/PX007/PX007_1/indels/
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+	
+nohup gunzip *gz &
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#3. Run Henry perl script to select PASS flag variants from pindel file
+/lustre/scratch117/casm/team154/em16/PX007/PX007_1/indels/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+nohup perl /lustre/scratch117/casm/team154/em16/LEUK4/LEUK4_1/indels/2016.05.20_filter_pass_pindel.pl &
+
+
+
+
+use strict;
+use warnings;
+
+
+my @file_list = `ls *pindel.annot.vcf`; # choose the files with "pindel.annot.vcf" in the title
+
+print "@file_list \n";
+
+foreach my $file (@file_list) {
+		
+	# open file
+	print "$file";
+	chomp $file;
+	open (my $fh, '<', $file) or die "Can't open $file, $! \n";
+	print "opened file: $file \n";
+  
+    # make an array with all the pass hits in exons/splice sites
+    my @filtered = ();
+    while (my $line = <$fh>) {
+        if ($line =~ (/PASS/)) {
+            #if ($line =~ (/CLPM=0.00/)) {
+                #if ($line =~ (/ASMD=14|ASMD=15/)) {
+                            push @filtered, $line;
+                        
+     #           }
+    #        }
+        }
+    }
+
+	# put all these hits in an output file
+	my $file_out = "$file"."_pass_flags"; # make output file with a name that links it to the input file
+	print "$file_out";
+	open (my $fh_out, '>', "$file_out") or die "Can't open $file_out\n";
+	print $fh_out "$_" for @filtered;
+	close $fh_out;
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## wc -l *pass_flags
+
+    1616 PD37580a_lo0002.pindel.annot.vcf_pass_flags
+     785 PD37580a_lo0003.pindel.annot.vcf_pass_flags
+    1286 PD37580a_lo0004.pindel.annot.vcf_pass_flags
+    1409 PD37580a_lo0005.pindel.annot.vcf_pass_flags
+    2156 PD37580a_lo0006.pindel.annot.vcf_pass_flags
+    1264 PD37580a_lo0007.pindel.annot.vcf_pass_flags
+     855 PD37580a_lo0008.pindel.annot.vcf_pass_flags
+    1271 PD37580a_lo0009.pindel.annot.vcf_pass_flags
+     970 PD37580a_lo0010.pindel.annot.vcf_pass_flags
+    1808 PD37580a_lo0011.pindel.annot.vcf_pass_flags
+     767 PD37580a_lo0012.pindel.annot.vcf_pass_flags
+    1576 PD37580a_lo0013.pindel.annot.vcf_pass_flags
+     312 PD37580a_lo0014.pindel.annot.vcf_pass_flags
+    1168 PD37580a_lo0015.pindel.annot.vcf_pass_flags
+    2208 PD37580a_lo0016.pindel.annot.vcf_pass_flags
+     934 PD37580a_lo0017.pindel.annot.vcf_pass_flags
+    2800 PD37580a_lo0019.pindel.annot.vcf_pass_flags
+    1021 PD37580a_lo0020.pindel.annot.vcf_pass_flags
+    1473 PD37580a_lo0021.pindel.annot.vcf_pass_flags
+    1580 PD37580a_lo0022.pindel.annot.vcf_pass_flags
+    1453 PD37580a_lo0025.pindel.annot.vcf_pass_flags
+    1297 PD37580a_lo0026.pindel.annot.vcf_pass_flags
+    1968 PD37580a_lo0027.pindel.annot.vcf_pass_flags
+    1585 PD37580a_lo0028.pindel.annot.vcf_pass_flags
+    1706 PD37580a_lo0030.pindel.annot.vcf_pass_flags
+     616 PD37580a_lo0032.pindel.annot.vcf_pass_flags
+    1534 PD37580a_lo0033.pindel.annot.vcf_pass_flags
+    2033 PD37580a_lo0034.pindel.annot.vcf_pass_flags
+    1156 PD37580a_lo0035.pindel.annot.vcf_pass_flags
+    1172 PD37580a_lo0036.pindel.annot.vcf_pass_flags
+    1888 PD37580a_lo0037.pindel.annot.vcf_pass_flags
+     998 PD37580a_lo0038.pindel.annot.vcf_pass_flags
+    1429 PD37580a_lo0039.pindel.annot.vcf_pass_flags
+    1476 PD37580a_lo0040.pindel.annot.vcf_pass_flags
+    1499 PD37580a_lo0041.pindel.annot.vcf_pass_flags
+    1197 PD37580a_lo0042.pindel.annot.vcf_pass_flags
+    1142 PD37580a_lo0043.pindel.annot.vcf_pass_flags
+    1928 PD37580a_lo0044.pindel.annot.vcf_pass_flags
+    1546 PD37580a_lo0045.pindel.annot.vcf_pass_flags
+    1381 PD37580a_lo0046.pindel.annot.vcf_pass_flags
+    1804 PD37580a_lo0047.pindel.annot.vcf_pass_flags
+    2312 PD37580a_lo0048.pindel.annot.vcf_pass_flags
+    3230 PD37580a_lo0049.pindel.annot.vcf_pass_flags
+    1408 PD37580a_lo0050.pindel.annot.vcf_pass_flags
+    1265 PD37580a_lo0051.pindel.annot.vcf_pass_flags
+    1541 PD37580a_lo0052.pindel.annot.vcf_pass_flags
+    1552 PD37580a_lo0053.pindel.annot.vcf_pass_flags
+    1456 PD37580a_lo0054.pindel.annot.vcf_pass_flags
+    1472 PD37580a_lo0055.pindel.annot.vcf_pass_flags
+    1389 PD37580a_lo0056.pindel.annot.vcf_pass_flags
+    1635 PD37580a_lo0057.pindel.annot.vcf_pass_flags
+    1064 PD37580a_lo0058.pindel.annot.vcf_pass_flags
+    1547 PD37580a_lo0059.pindel.annot.vcf_pass_flags
+    2845 PD37580a_lo0060.pindel.annot.vcf_pass_flags
+    1566 PD37580a_lo0061.pindel.annot.vcf_pass_flags
+    1696 PD37580a_lo0062.pindel.annot.vcf_pass_flags
+    2123 PD37580a_lo0063.pindel.annot.vcf_pass_flags
+    1282 PD37580a_lo0064.pindel.annot.vcf_pass_flags
+    3451 PD37580a_lo0065.pindel.annot.vcf_pass_flags
+    1543 PD37580a_lo0066.pindel.annot.vcf_pass_flags
+     946 PD37580a_lo0067.pindel.annot.vcf_pass_flags
+    1870 PD37580a_lo0068.pindel.annot.vcf_pass_flags
+    1612 PD37580a_lo0069.pindel.annot.vcf_pass_flags
+    1533 PD37580a_lo0070.pindel.annot.vcf_pass_flags
+    1279 PD37580a_lo0071.pindel.annot.vcf_pass_flags
+    1417 PD37580a_lo0072.pindel.annot.vcf_pass_flags
+    1322 PD37580a_lo0073.pindel.annot.vcf_pass_flags
+    1967 PD37580a_lo0074.pindel.annot.vcf_pass_flags
+    1449 PD37580a_lo0075.pindel.annot.vcf_pass_flags
+    1576 PD37580a_lo0076.pindel.annot.vcf_pass_flags
+     883 PD37580a_lo0077.pindel.annot.vcf_pass_flags
+    1344 PD37580a_lo0078.pindel.annot.vcf_pass_flags
+    1729 PD37580a_lo0079.pindel.annot.vcf_pass_flags
+    1107 PD37580a_lo0080.pindel.annot.vcf_pass_flags
+    1210 PD37580a_lo0081.pindel.annot.vcf_pass_flags
+    1223 PD37580a_lo0082.pindel.annot.vcf_pass_flags
+     805 PD37580a_lo0083.pindel.annot.vcf_pass_flags
+    1321 PD37580a_lo0084.pindel.annot.vcf_pass_flags
+    1191 PD37580a_lo0085.pindel.annot.vcf_pass_flags
+    1276 PD37580a_lo0086.pindel.annot.vcf_pass_flags
+    1588 PD37580a_lo0087.pindel.annot.vcf_pass_flags
+    1466 PD37580a_lo0088.pindel.annot.vcf_pass_flags
+    1135 PD37580a_lo0089.pindel.annot.vcf_pass_flags
+     963 PD37580a_lo0090.pindel.annot.vcf_pass_flags
+    3094 PD37580a_lo0091.pindel.annot.vcf_pass_flags
+     668 PD37580a_lo0092.pindel.annot.vcf_pass_flags
+     938 PD37580a_lo0093.pindel.annot.vcf_pass_flags
+    1832 PD37580a_lo0094.pindel.annot.vcf_pass_flags
+    1393 PD37580a_lo0095.pindel.annot.vcf_pass_flags
+    1830 PD37580a_lo0096.pindel.annot.vcf_pass_flags
+    1836 PD37580a_lo0097.pindel.annot.vcf_pass_flags
+    1449 PD37580a_lo0098.pindel.annot.vcf_pass_flags
+    1144 PD37580a_lo0100.pindel.annot.vcf_pass_flags
+    1859 PD37580a_lo0101.pindel.annot.vcf_pass_flags
+  140699 total
+
+
+# 94 files total
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 3. Get one long bed file of all the indels, copy to new directory, create output file
+cgpfarm
+/lustre/scratch117/casm/team154/em16/PX007/PX007_1/indels/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+cut -f 1,2,4,5 *pindel.annot.vcf_pass_flags | sort | uniq > PX007_1_filtered_indels.bed
+grep -v "#" PX007_1_filtered_indels.bed > PX007_1_filtered_indels_no#.bed # remove lines starting with "#"
+mv PX007_1_filtered_indels_no#.bed PX007_1_filtered_indels.bed
+
+#9814 PX007_1_filtered_indels.bed
+                     
+mkdir output
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 4. Run cgpVAF script to create cgpVAF commands that are split per chromosome
+        farm5
+        /lustre/scratch117/casm/team154/em16/PX007/PX007_1/indels/
+        Creates: cgpVafChr.cmd (commands split per chr) cgpVafConcat.cmd (commands to concatenate split output) run_bsub.sh (script to set off commands in first two files)
+farm5
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+module load cgpVAFcommand
+
+createVafCmd.pl -pid 2919 -u PD37580a_lo0002 PD37580a_lo0003 PD37580a_lo0004 PD37580a_lo0005 PD37580a_lo0006 PD37580a_lo0007 PD37580a_lo0008 PD37580a_lo0009 PD37580a_lo0010 PD37580a_lo0011 PD37580a_lo0012 PD37580a_lo0013 PD37580a_lo0014 PD37580a_lo0015 PD37580a_lo0016 PD37580a_lo0017 PD37580a_lo0019 PD37580a_lo0020 PD37580a_lo0021 PD37580a_lo0022 PD37580a_lo0025 PD37580a_lo0026 PD37580a_lo0027 PD37580a_lo0028 PD37580a_lo0030 PD37580a_lo0032 PD37580a_lo0033 PD37580a_lo0034 PD37580a_lo0035 PD37580a_lo0036 PD37580a_lo0037 PD37580a_lo0038 PD37580a_lo0039 PD37580a_lo0040 PD37580a_lo0041 PD37580a_lo0042 PD37580a_lo0043 PD37580a_lo0044 PD37580a_lo0045 PD37580a_lo0046 PD37580a_lo0047 PD37580a_lo0048 PD37580a_lo0049 PD37580a_lo0050 PD37580a_lo0051 PD37580a_lo0052 PD37580a_lo0053 PD37580a_lo0054 PD37580a_lo0055 PD37580a_lo0056 PD37580a_lo0057 PD37580a_lo0058 PD37580a_lo0059 PD37580a_lo0060 PD37580a_lo0061 PD37580a_lo0062 PD37580a_lo0063 PD37580a_lo0064 PD37580a_lo0065 PD37580a_lo0066 PD37580a_lo0067 PD37580a_lo0068 PD37580a_lo0069 PD37580a_lo0070 PD37580a_lo0071 PD37580a_lo0072 PD37580a_lo0073 PD37580a_lo0074 PD37580a_lo0075 PD37580a_lo0076 PD37580a_lo0077 PD37580a_lo0078 PD37580a_lo0079 PD37580a_lo0080 PD37580a_lo0081 PD37580a_lo0082 PD37580a_lo0083 PD37580a_lo0084 PD37580a_lo0085 PD37580a_lo0086 PD37580a_lo0087 PD37580a_lo0088 PD37580a_lo0089 PD37580a_lo0090 PD37580a_lo0091 PD37580a_lo0092 PD37580a_lo0093 PD37580a_lo0094 PD37580a_lo0095 PD37580a_lo0096 PD37580a_lo0097 PD37580a_lo0098 PD37580a_lo0100 PD37580a_lo0101 -o output -g /lustre/scratch119/casm/team78pipelines/reference/human/GRCh37d5/genome.fa -hdr /lustre/scratch119/casm/team78pipelines/reference/human/GRCh37d5/shared/ucscHiDepth_0.01_mrg1000_no_exon_coreChrs.bed.gz -mq 30  -bo 1  -b PX007_1_filtered_indels.bed
+                                               
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 5. Modify config.ini file (in output directory) to have approx 10 bams per job (splits by bams as well as by chr)
+	/lustre/scratch117/casm/team154/em16/PX007/PX007_1/indels/output/
+farm5
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+[2919]
+PDv37is_UNM1= <<EOT
+PD40521n
+PD40521wt
+PD40521xc
+PD40521xd
+PD40521xe
+PD40521xf
+PD40521xg
+PD40521xh
+PD40521xi
+PD40521xj
+EOT
+PDv37is_UNM2= <<EOT
+PD40521xk
+PD40521xl
+PD40521wu
+PD40521xm
+PD40521xn
+PD40521xo
+PD40521xp
+PD40521xq
+PD40521xr
+PD40521wv
+EOT
+PDv37is_UNM3= <<EOT
+PD40521ww
+PD40521wx
+PD40521wy
+PD40521wz
+PD40521xa
+PD40521xb
+PD40521w
+PD40521di
+PD40521dj
+PD40521dk
+EOT
+PDv37is_UNM4= <<EOT
+PD40521dl
+etc
+
+[UserData]
+bedfile=PX007_1_filtered_indels.bed
+
+[genome_build]
+genome=human
+build=GRCh37d5
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 6. Save .ini file as 2919_cgpVafConfig.ini and run following command to create amended split commands
+Farm5
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+createVafCmd.pl -pid 2919 -o output -i output/2919_cgpVafConfig.ini -g /lustre/scratch119/casm/team78pipelines/reference/human/GRCh37d5/genome.fa -hdr /lustre/scratch119/casm/team78pipelines/reference/human/GRCh37d5/shared/ucscHiDepth_0.01_mrg1000_no_exon_coreChrs.bed.gz -mq 30  -bo 1  -b PX007_1_filtered_indels.bed
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 7. Edit run_bsub.sh command to increase memory and use long queue
+            run_bsub.sh command sets off jobs in cgpVafChr.cmd file that has been created
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+set -e;
+set -o pipefail;
+                                               
+jobid=`bsub -oo cgpvaf%I.log -q normal -J 'batchjobs[1-528]%25' -n 1 -R 'select[mem>=8000] span[hosts=1] rusage[mem=8000]' -M8000 '/software/$tware/CGP/projects/cgpVAFcommand/perl/bin/farm_idx_exec.pl cgpVafChr.cmd $LSB_JOBINDEX' |  perl -ane '($id)=$_=~/Job\s+<(\d+)>.*/; print$id'`
+                                               
+bsub -w -oo concat%I.log -q normal -J 'batchjobs[1-22]%22' -n 1 -R 'select[mem>=1000] span[hosts=1] rusage[mem=1000]' -M1000 '/software/CGP/projects/cgpVAFcommand/perl/bin/farm_idx_exec.pl cgpVafConcat.cmd $LSB_JOBINDEX'
+                                
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 8. Run run_bsub.sh command   (210921)
+	/lustre/scratch117/casm/team154/em16/PX007/PX007_1/indels/
+cgpfarm
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bash run_bsub.sh
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 9. Check output /lustre/scratch117/casm/team154/em16/PX007/PX007_1/indels/output/output/PDv37is/indel
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+PDv37is_PD37580a_lo0002_indel_vaf.tsv	      PDv37is_PD37580a_lo0050_indel_vaf.tsv
+PDv37is_PD37580a_lo0002_indel_vaf.vcf	      PDv37is_PD37580a_lo0050_indel_vaf.vcf
+PDv37is_PD37580a_lo0002_indel_vaf.vcf.gz      PDv37is_PD37580a_lo0050_indel_vaf.vcf.gz
+PDv37is_PD37580a_lo0002_indel_vaf.vcf.gz.tbi  PDv37is_PD37580a_lo0050_indel_vaf.vcf.gz.tbi
+PDv37is_PD37580a_lo0006_indel_vaf.tsv	      PDv37is_PD37580a_lo0069_indel_vaf.tsv
+PDv37is_PD37580a_lo0006_indel_vaf.vcf	      PDv37is_PD37580a_lo0069_indel_vaf.vcf
+PDv37is_PD37580a_lo0006_indel_vaf.vcf.gz      PDv37is_PD37580a_lo0069_indel_vaf.vcf.gz
+PDv37is_PD37580a_lo0006_indel_vaf.vcf.gz.tbi  PDv37is_PD37580a_lo0069_indel_vaf.vcf.gz.tbi
+PDv37is_PD37580a_lo0010_indel_vaf.tsv	      PDv37is_PD37580a_lo0078_indel_vaf.tsv
+PDv37is_PD37580a_lo0010_indel_vaf.vcf	      PDv37is_PD37580a_lo0078_indel_vaf.vcf
+PDv37is_PD37580a_lo0010_indel_vaf.vcf.gz      PDv37is_PD37580a_lo0078_indel_vaf.vcf.gz
+PDv37is_PD37580a_lo0010_indel_vaf.vcf.gz.tbi  PDv37is_PD37580a_lo0078_indel_vaf.vcf.gz.tbi
+PDv37is_PD37580a_lo0032_indel_vaf.tsv	      PDv37is_PD37580a_lo0087_indel_vaf.tsv
+PDv37is_PD37580a_lo0032_indel_vaf.vcf	      PDv37is_PD37580a_lo0087_indel_vaf.vcf
+PDv37is_PD37580a_lo0032_indel_vaf.vcf.gz      PDv37is_PD37580a_lo0087_indel_vaf.vcf.gz
+PDv37is_PD37580a_lo0032_indel_vaf.vcf.gz.tbi  PDv37is_PD37580a_lo0087_indel_vaf.vcf.gz.tbi
+PDv37is_PD37580a_lo0041_indel_vaf.tsv	      PDv37is_PD37580a_lo0096_indel_vaf.tsv
+PDv37is_PD37580a_lo0041_indel_vaf.vcf	      PDv37is_PD37580a_lo0096_indel_vaf.vcf
+PDv37is_PD37580a_lo0041_indel_vaf.vcf.gz      PDv37is_PD37580a_lo0096_indel_vaf.vcf.gz
+PDv37is_PD37580a_lo0041_indel_vaf.vcf.gz.tbi  PDv37is_PD37580a_lo0096_indel_vaf.vcf.gz.tbi
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 10.  Remove extra lines in headers of vaf.tsv files with more than 10 bam files
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Ensure headers are the same length
+wc -l *_vaf.tsv
+
+    9862 PDv37is_PD37580a_lo0002_indel_vaf.tsv
+    9862 PDv37is_PD37580a_lo0006_indel_vaf.tsv
+    9863 PDv37is_PD37580a_lo0010_indel_vaf.tsv
+    9862 PDv37is_PD37580a_lo0032_indel_vaf.tsv
+    9862 PDv37is_PD37580a_lo0041_indel_vaf.tsv
+    9862 PDv37is_PD37580a_lo0050_indel_vaf.tsv
+    9862 PDv37is_PD37580a_lo0069_indel_vaf.tsv
+    9862 PDv37is_PD37580a_lo0078_indel_vaf.tsv
+    9862 PDv37is_PD37580a_lo0087_indel_vaf.tsv
+    9855 PDv37is_PD37580a_lo0096_indel_vaf.tsv
+   98614 total
+
+
+ls *_vaf.tsv > files
+
+for i in {1..10}
+do grep -v "##" $(sed -n $i'p' files) > tsv$i
+done
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 11. Cut columns of interest to new files: Chrom Pos Ref Alt then MTR DEP for all samples
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Create list of files of interest in list saved as 'files'
+ls tsv* > tsv_files
+
+#for first file
+cut -f 3,4,5,6,25,27,34,36,43,45,52,54,61,63,70,72,79,81,88,90,97,99,106,108,115,117 $(sed -n '1p' tsv_files) > output1   #Chr, Pos, Ref, Alt, + MTR, DEP for all samples (max 11 samples in one file)
+
+#for subsequent files (exclude Chr, Pos, Ref, Alt and PDv37is)
+for i in {2..10}
+do
+cut -f 25,27,34,36,43,45,52,54,61,63,70,72,79,81,88,90,97,99,106,108,115,117 $(sed -n $i'p' tsv_files) >  output$i
+done
+
+
+#Concatenate output files to one merged file
+
+paste output* > PX007_1_indel_filtered_merged_cut.tsv
+
+#9815 PX007_1_indel_filtered_merged_cut.tsv
+
+#Copy files to local drive
+
+scp -r farm5-login:/lustre/scratch117/casm/team154/em16/PX007/PX007_1/indels/output/output/PDv37is/indel/PX007_1_indel_filtered_merged_cut.tsv /Users/em16/Documents/PhD/Sequencing_results/DNA_seq/PX007/PX007_1/indels
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Continue analysis as per filtering in the SNV workflow example
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+

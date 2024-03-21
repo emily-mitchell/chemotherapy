@@ -1,0 +1,457 @@
+---
+title: "Tree_analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.width=40, fig.height=15, warning=FALSE)
+```
+
+Open packages
+```{r}
+suppressMessages(library(stringr))
+suppressMessages(library(ggtree))
+suppressMessages(library(ape))
+suppressMessages(library(seqinr))
+suppressMessages(library(data.table))
+suppressMessages(library(phytools))
+suppressMessages(library(devtools))
+suppressMessages(library(MCMCglmm))
+suppressMessages(library(phangorn))
+suppressMessages(library(spam))
+suppressMessages(library(INLA))
+suppressMessages(library(phylodyn))
+suppressMessages(library(ggplot2))
+suppressMessages(library(dplyr))
+```
+
+Set file paths and working directory
+```{r}
+PDID ="PD37580"
+ID = "PX007" #Edit
+Iteration = "PX007_1" #Edit
+Run_ID = "PX007_1_01" #Edit
+filtering_ID = "standard_rho01" #Edit
+mutlim = 13000 #Edit
+age = 43 #Edit
+age_breaks = c(0,10,20,30,40,50) #Edit
+mut_breaks = c(0,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000) #Edit
+setwd = paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/")
+mats_and_param_file = paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/output/mats_and_params_", Run_ID)
+tree_file_path = paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/output/tree_", Run_ID,"_",filtering_ID, ".tree")
+file_annot = paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/output/annotated_mut_set_", Run_ID,"_",filtering_ID)
+sensitivity_df = paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/output/",Iteration,"_sensitivity")
+XY_cn = paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/driver_info/",Iteration,"_y_loss.csv")
+CN_file = paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/ascat/",Iteration,"_ascat_summary.csv")
+SV_file = "~/Documents/PhD/Sequencing_results/Mutographs/XX_GRIDSS/gridss_all_cut_final.csv"
+#final_gene_file = paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/driver_info/",Iteration,"_driver_genes_final.csv")
+info_nodes_file <- paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/driver_info/",Iteration,"_info_nodes.csv")
+mut_burden = paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/subs/vaf_cut/mutation_burden/",Iteration,"_sub_dep_adj.txt")
+```
+
+Source tree plot scripts
+```{r}
+function_files=list.files('~/Documents/Bioinformatics/CGP/Functions/', full.names = TRUE, pattern = ".R")
+suppressMessages(sapply(function_files, source))
+```
+
+
+Import myeloid malignancy gene list
+```{r}
+chip_drivers = read.csv("~/Documents/Bioinformatics/CGP/Filtering/chip_drivers.csv", stringsAsFactors = FALSE, header = FALSE)
+chip_drivers <- chip_drivers$V1
+```
+
+
+Import top clonal haem gene list
+```{r}
+top_genes = read.csv("~/Documents/Bioinformatics/CGP/Filtering/final_gene_list.csv", stringsAsFactors = FALSE, header = FALSE)
+top_genes <- top_genes$V1
+```
+
+Import variant annotation list
+```{r}
+top_variants = read.csv("~/Documents/Bioinformatics/CGP/Filtering/top_genes_chemo_annotation_EM.csv", stringsAsFactors = FALSE, header = TRUE)
+oncogenic_variants <- top_variants$variant_ID[top_variants$EM == "Oncogenic"]
+possible_oncogenic_variants <- top_variants$variant_ID[top_variants$EM == "Possible_oncogenic"]
+```
+
+
+Import cancer census gene list
+```{r}
+cancer_drivers = read.table("~/Documents/Bioinformatics/CGP/Filtering/cancer_census.csv", stringsAsFactors = FALSE, header = TRUE, sep = ",")
+cancer_drivers <- cancer_drivers$Gene.Symbol
+```
+
+
+Import dnds lists
+```{r}
+dnds_genes_1500 = read.csv("~/Documents/Bioinformatics/CGP/Filtering/dnds_genes_1500.csv", stringsAsFactors = FALSE, header = FALSE)
+dnds_genes_1500 <- dnds_genes_1500$V1
+```
+
+Import expanded clade list
+```{r}
+#expanded_clades = read.csv(paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/driver_info/",Iteration,"_expanded_clades_cut.csv"), stringsAsFactors = FALSE, header = TRUE)
+```
+
+
+Load cosmic mutation data verion 92
+```{r}
+cosmic <- read.table("~/Documents/Bioinformatics/CGP/Filtering/CosmicMutantExportCensus.tsv", sep = "\t", stringsAsFactors = FALSE, header = T)
+```
+
+Filter cosmic variant list to only include variants in top genes that have been found in haematopoietic malignancies and are predicted to be pathogenic
+```{r}
+cosmic_cut <- cosmic[cosmic$Gene.name %in% top_genes & cosmic$FATHMM.prediction == "PATHOGENIC" & cosmic$Primary.site == "haematopoietic_and_lymphoid_tissue" ,]
+cosmic_cut$variant_ID <- paste(cosmic_cut$Gene.name, cosmic_cut$Mutation.AA)
+pathogenic_variants <- cosmic_cut$variant_ID
+pathogenic_variants <- unique(pathogenic_variants)
+pathogenic_variants <- sort(pathogenic_variants)
+```
+
+Load files
+```{r}
+load(mats_and_param_file)
+load(file_annot)
+tree <- read.tree(tree_file_path)
+sensitivity <- read.table(sensitivity_df,stringsAsFactors = FALSE, header = TRUE)
+XY <- read.csv(XY_cn,stringsAsFactors = FALSE, header = TRUE)
+CN <- read.csv(CN_file, stringsAsFactors = FALSE, header = TRUE)
+SV <- read.csv(SV_file,stringsAsFactors = FALSE, header = TRUE)
+muts <- read.table(mut_burden,stringsAsFactors = FALSE, header = TRUE)
+info_nodes <- read.csv(info_nodes_file,stringsAsFactors = FALSE, header = TRUE)
+```
+
+Calculate mean muts
+```{r}
+meanmut = mean(muts$Number_mutations[muts$Mean_depth > 15])
+```
+
+Re-label the key objects for the plot_tree functions
+```{r}
+details <- filtered_muts$COMB_mats.tree.build$mat
+details$Type <- as.character(details$Type)
+details$Gene <- as.character(details$Gene)
+details$variant_ID <- paste(details$Gene, details$Protein, sep = " ")
+details$Type[details$Type == ""] <- "no_annotation"
+mtr <- filtered_muts$COMB_mats.tree.build$NV
+dep <- filtered_muts$COMB_mats.tree.build$NR
+```
+
+
+Make coverage corrected tree
+```{r}
+tree_adj <- get_corrected_tree(tree, details, sensitivity, include_SNVs = TRUE, include_indels = FALSE, get_edge_from_tree = FALSE)
+
+```
+
+Plot corrected tree no labels v2
+```{r}
+pdf(paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/tree_pdfs/",Iteration,"_corrected_v2.pdf"),width=12,height=4)
+tree = plot_tree_em(tree_adj,cex.label = 0)
+dev.off()
+```
+
+Make tree ultrametric (use corrected tree)
+```{r}
+tree_ultra <- make.ultrametric.tree(tree_adj)
+```
+
+Ultrametric tree with age as x axis
+```{r}
+tree_ultra_age <- tree_ultra
+tree_ultra_age$edge.length <- tree_ultra_age$edge.length*age
+```
+
+Ultrametric tree with muts as x axis
+```{r}
+tree_ultra_mut <- tree_ultra
+tree_ultra_mut$edge.length <- tree_ultra_mut$edge.length*meanmut
+```
+
+Add copy number and structural variant information to details matrix
+```{r}
+details <- rbind(details, info_nodes)
+```
+
+
+Annotate details matrix
+```{r}
+details$protein_coding_mutation <- ifelse(details$Type %in% c("protein_coding:exon:CDS:substitution:codon_variant:non_synonymous_codon",
+                                                  "protein_coding:exon:CDS:insertion:frameshift_variant",
+                                                  "protein_coding:exon:CDS:substitution:codon_variant:stop_gained",
+                                                  "protein_coding:exon:CDS:substitution:codon_variant:initiator_codon_change",
+                                                  
+"protein_coding:exon:CDS:deletion:frameshift_variant",
+                                                  "protein_coding:exon:CDS:deletion:inframe_variant:inframe_codon_loss"),
+                              "Protein coding mutation", "no")
+details$splice_variant <- ifelse(grepl(pattern = "splice", x = details$Type),
+                              "Splice variant", "no")
+details$exon_UTR <- ifelse(grepl(pattern = "UTR", x = details$Type) & grepl(pattern = "exon", x = details$Type),
+                                 "UTR exon", "no")
+details$intron_UTR <- ifelse(grepl(pattern = "UTR", x = details$Type) & grepl(pattern = "intron", x = details$Type),
+                           "UTR intron", "no")
+
+details$protein_coding_chip_variant = ifelse(details$Gene %in% chip_drivers & details$protein_coding_mutation == "Protein coding mutation",
+                                  "Protein coding variant in driver gene", "no")
+
+details$dnds_variant_1500 = ifelse(details$Gene %in% dnds_genes_1500 & details$protein_coding_mutation == "Protein coding mutation",
+                                  "Dnds gene", "no")
+
+details$cancer_drivers = ifelse(details$Gene %in% cancer_drivers & details$protein_coding_mutation == "Protein coding mutation",
+                                  "Cancer gene", "no")
+
+details$oncogenic = ifelse(details$variant_ID %in% oncogenic_variants, #& details$node < length(tree$tip.label),
+                                  "Oncogenic variant" , "no")
+
+details$possible_oncogenic = ifelse(details$variant_ID %in% possible_oncogenic_variants, #& details$node < length(tree$tip.label),
+                                  "Possible oncogenic variant" , "no")
+
+details$expanded_cancer_drivers = ifelse(details$Gene %in% cancer_drivers & details$protein_coding_mutation == "Protein coding mutation" & details$node > length(tree$tip.label),
+                                  "Expanded cancer gene", "no")
+#To plot labels last
+details$final = ifelse((details$variant_ID %in% oncogenic_variants) | (details$variant_ID %in% possible_oncogenic_variants) | (details$Mut_type == "CN"),
+                                  "Final", "no")
+
+details$SV = ifelse((details$Mut_type == "SV"),
+                    "SV", "no")
+
+details$clade = ifelse((details$Mut_type == "Expanded_clade" ),
+                    "Expanded clade", "no")
+
+details$prog = ifelse((details$Mut_type == "Prog"),
+                    "Progenitor", "no")
+
+```
+
+
+Labelling tree based on top genes present anywhere 
+```{r}
+#Plot the selected branches on the tree
+pdf(paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/tree_pdfs/",Iteration,"_final.pdf"),w=40,h=20)
+tree=plot_tree(tree_ultra_mut,cex.label = 0)
+
+plot_tree_labels(tree,
+                 details = details,
+                type = "line",
+                 query.field = "top_gene",
+                data.frame(value="Top gene",col="red",pch = 17,stringsAsFactors = FALSE),
+                label.field = "variant_ID",
+               cex.label = 2.0)
+
+dev.off()
+```
+Create vector of Y loss
+```{r}
+id <- tree$tip.label
+id <- as.matrix(id)
+colnames(id) <- "id"
+id <- as.data.frame(id)
+XY <- as.data.frame(XY)
+Y_loss <- left_join(id, XY, by ="id")
+Y_loss <- Y_loss$cnY
+Y_loss <- factor(Y_loss, levels=c("none", "loss Y", "gain Y"))
+```
+
+
+With top genes, CN annotated
+```{r}
+pdf(paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/tree_pdfs/",Iteration,"_final_CN.pdf"),w=60,h=20, useDingbats = FALSE)
+tree =plot_tree(tree_ultra_age, cex.label = 5, cex.terminal.dots = 0)
+plot_tree_lines(tree,
+                 details = details,
+                 type = "line",
+                 query.field = "oncogenic",
+                 col = "red",
+                 data.frame(value="Oncogenic variant", stringsAsFactors = FALSE))
+
+plot_tree_labels(tree,
+                 details = details,
+                 type = "label",
+                 query.field = "final",
+                 data.frame(value="Final",stringsAsFactors = FALSE, col = 0, pch = 17),
+                 label.field = "variant_ID",
+                 cex.label = 4.0)
+
+
+
+dev.off()
+```
+
+Final tree with heatmap information below
+```{r}
+pdf(paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/tree_pdfs/",Iteration,"_tree_heatmap.pdf"), w = 60, h= 20,useDingbats = FALSE)
+  tree= tree_ultra_mut
+  ##Set up heat map
+  nodes_driver= details$node[(details$variant_ID %in% oncogenic_variants) | (details$variant_ID %in% possible_oncogenic_variants)]
+  nodes_clade= info_nodes$node[info_nodes$Mut_type == "Expanded_clade"]
+  labels=c("Known Driver","Expanded Clade")
+  hm=matrix("white",ncol=length(tree$tip.label),nrow=2)
+  colnames(hm)=tree$tip.label
+  rownames(hm)=labels
+  ## In this case we populate the colours based on the membership of the clade (could be signature contributions or whatever).
+  ## Could also maybe use rownames as labels (on the LHS of the plot?).
+  tips_driver = NULL
+  for(i in 1:length(nodes_driver)){
+  tips_driver <- c(tips_driver, get_samples_in_clade(nodes_driver[i],tree))
+  }
+  hm[1,match(tips_driver,tree$tip.label)]="red"
+  
+  tips_clade = NULL
+  for(i in 1:length(nodes_clade)){
+  tips_clade <- c(tips_clade, get_samples_in_clade(nodes_clade[i],tree))
+  }
+  hm[2,match(tips_clade,tree$tip.label)]="blue"
+
+  
+  ## plot basic tree (need to keep the returned tree)
+  tree =plot_tree(tree_ultra_mut, cex.label = 5, cex.terminal.dots = 0, vspace.reserve = 0.2)
+plot_tree_lines(tree,
+                 details = details,
+                 type = "line",
+                 query.field = "clade",
+                  col = "blue",
+                 data.frame(value="Expanded clade",stringsAsFactors = FALSE))
+
+plot_tree_lines(tree,
+                 details = details,
+                 type = "line",
+                 query.field = "oncogenic",
+                 col = "red",
+                 data.frame(value="Oncogenic variant", stringsAsFactors = FALSE))
+
+plot_tree_labels(tree,
+                 details = details,
+                 type = "label",
+                 query.field = "final",
+                 data.frame(value="Final",stringsAsFactors = FALSE, col = 0, pch = 17),
+                 label.field = "variant_ID",
+                 cex.label = 4.0)
+  tree=add_heatmap(tree,heatmap=hm,cex.label = 5)
+dev.off()
+```
+
+
+Final tree with heatmap information below axis adjusted for birth
+```{r}
+pdf(paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/tree_pdfs/",Iteration,"_tree_heatmap_adj.pdf"), w = 60, h= 20,useDingbats = FALSE)
+  tree= tree_ultra_age
+  ##Set up heat map
+  nodes_driver= details$node[(details$variant_ID %in% oncogenic_variants) | (details$variant_ID %in% possible_oncogenic_variants)]
+  nodes_clade= info_nodes$node[info_nodes$Mut_type == "Expanded_clade"]
+  labels=c("Known Driver","Expanded Clade")
+  hm=matrix("white",ncol=length(tree$tip.label),nrow=2)
+  colnames(hm)=tree$tip.label
+  rownames(hm)=labels
+  ## In this case we populate the colours based on the membership of the clade (could be signature contributions or whatever).
+  ## Could also maybe use rownames as labels (on the LHS of the plot?).
+  tips_driver = NULL
+  for(i in 1:length(nodes_driver)){
+  tips_driver <- c(tips_driver, get_samples_in_clade(nodes_driver[i],tree))
+  }
+  hm[1,match(tips_driver,tree$tip.label)]="red"
+  
+  tips_clade = NULL
+  for(i in 1:length(nodes_clade)){
+  tips_clade <- c(tips_clade, get_samples_in_clade(nodes_clade[i],tree))
+  }
+  hm[2,match(tips_clade,tree$tip.label)]="blue"
+
+  
+  ##Set up the axis for plotting
+  
+muts_from_age=function(age,tree,sampling_age,birth_muts=55) {
+  sampling_age_muts=mean(get_mut_burden(tree))
+  n_muts=birth_muts + (age*(sampling_age_muts-birth_muts)/sampling_age)
+  return(n_muts)
+  }
+  
+binwidth=10
+max_age_to_plot=binwidth*ceiling(age/binwidth)
+axis_at=c(0,sapply(seq(0,max_age_to_plot,by=binwidth),muts_from_age,tree_ultra_mut, age))
+labels_at=c("Conception","Birth",seq(binwidth,max_age_to_plot,by=binwidth))
+  
+  
+  ## plot basic tree (need to keep the returned tree)
+  tree =plot_tree(tree_ultra_mut, cex.label = 0,plot_axis=F, cex.terminal.dots = 0, vspace.reserve = 0.1)
+  axis(side=4,at=mean(get_mut_burden(tree))-axis_at,labels = labels_at,las=2,cex.axis=5)
+plot_tree_lines(tree,
+                 details = details,
+                 type = "line",
+                 query.field = "clade",
+                  col = "blue",
+                 data.frame(value="Expanded clade",stringsAsFactors = FALSE))
+
+plot_tree_lines(tree,
+                 details = details,
+                 type = "line",
+                 query.field = "oncogenic",
+                 col = "red",
+                 data.frame(value="Oncogenic variant", stringsAsFactors = FALSE))
+
+plot_tree_labels(tree,
+                 details = details,
+                 type = "label",
+                 query.field = "final",
+                 data.frame(value="Final",stringsAsFactors = FALSE, col = 0, pch = 17),
+                 label.field = "variant_ID",
+                 cex.label = 4.0)
+  tree=add_heatmap(tree,heatmap=hm,cex.label = 5)
+dev.off()
+```
+
+Structural variant tree with coloured branches and heatmap
+```{r}
+
+pdf(paste0("~/Documents/PhD/Sequencing_results/DNA_seq/",ID,"/",Iteration,"/trees/vaf_cut/tree_pdfs/",Iteration,"_SV_final.pdf"), w = 60, h= 20,useDingbats = FALSE)
+tree= tree_ultra_age
+##Set up heat map
+  nodes_SV= info_nodes$node[info_nodes$Mut_type == "SV"]
+  labels="Structural variant"
+  hm=matrix("white",ncol=length(tree$tip.label),nrow=1)
+  colnames(hm)=tree$tip.label
+  rownames(hm)=labels
+  ## In this case we populate the colours based on the membership of the clade (could be signature contributions or whatever).
+  ## Could also maybe use rownames as labels (on the LHS of the plot?).
+  tips_SV = NULL
+#  for(i in 1:length(nodes_SV)){
+#  tips_SV <- c(tips_SV, get_samples_in_clade(nodes_SV[i],tree))
+# }
+  hm[1,match(tips_SV,tree$tip.label)]="red"
+
+  tree =plot_tree(tree_ultra_age, cex.label = 5, cex.terminal.dots = 0)
+plot_tree_lines(tree,
+                 details = details,
+                 type = "line",
+                 query.field = "SV",
+                 col = "red",
+                 data.frame(value="SV", stringsAsFactors = FALSE))
+plot_tree_labels(tree,
+                 details = details,
+                 type = "label",
+                 query.field = "SV",
+                 data.frame(value="SV",stringsAsFactors = FALSE, col = 0, pch = 17),
+                 label.field = "variant_ID",
+                 cex.label = 4.0)
+
+plot_tree_lines(tree,
+                 details = details,
+                 type = "line",
+                 query.field = "Mut_type",
+                 col = "blue",
+                 lty = 2,
+                 data.frame(value="CN",stringsAsFactors = FALSE))
+
+plot_tree_labels(tree,
+                 details = details,
+                 type = "label",
+                 query.field = "Mut_type",
+                 data.frame(value="CN",stringsAsFactors = FALSE, col = 0, pch = 17),
+                 label.field = "variant_ID",
+                 cex.label = 4.0)
+
+tree=add_heatmap(tree,heatmap=hm,cex.label = 5)
+dev.off()
+```
+
