@@ -1,0 +1,87 @@
+MPBoot 1.1.0 built Mar 23 2018
+
+Input file name: /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/analysis/tree_files/Mutations_MPBoot_PD37580.fa
+Type of analysis: Parsimony tree reconstruction + MPBoot bootstrap approximation (1000 replicates)
+Random seed number: 701204
+
+SEQUENCE ALIGNMENT
+------------------
+
+Input data: 11 sequences with 8507 nucleotide sites
+Number of constant sites: 0 (= 0% of all sites)
+Number of site patterns: 180
+
+MAXIMUM PARSIMONY TREE
+-----------------------
+
+NOTE: Tree is UNROOTED although outgroup taxon 'Ancestral' is drawn at root
+Numbers in parentheses are  ultrafast bootstrap supports (%)
+
++--Ancestral
+|
+|        +--PD37580a_lo0016
+|     +--| (100)
+|     |  +--PD37580a_lo0006
+|  +--| (100)
+|  |  +--PD37580a_lo0048
++--| (56)
+|  |  +--PD37580a_lo0065
+|  +--| (56)
+|     +--PD37580a_lo0091
+|
+|           +--PD37580a_lo0019
+|        +--| (100)
+|        |  +--PD37580a_lo0060
+|     +--| (90)
+|     |  +--PD37580a_lo0034
+|  +--| (75)
+|  |  +--PD37580a_lo0049
++--| (62)
+   +--PD37580a_lo0063
+
+Parsimony score of the tree: 8719
+Tree in newick format:
+
+(Ancestral,(((PD37580a_lo0016,PD37580a_lo0006)100,PD37580a_lo0048)100,(PD37580a_lo0065,PD37580a_lo0091)56)56,((((PD37580a_lo0019,PD37580a_lo0060)100,PD37580a_lo0034)90,PD37580a_lo0049)75,PD37580a_lo0063)62);
+
+CONSENSUS TREE
+--------------
+
+Consensus tree is constructed from 1000 bootstrap trees
+Branches with bootstrap support >0.000000% are kept (extended consensus)
+Numbers in parentheses are bootstrap supports (%)
+
++--Ancestral
+|
+|        +--PD37580a_lo0016
+|     +--| (100)
+|     |  +--PD37580a_lo0006
+|  +--| (100)
+|  |  +--PD37580a_lo0048
++--| (56)
+|  |  +--PD37580a_lo0065
+|  +--| (56)
+|     +--PD37580a_lo0091
+|
+|           +--PD37580a_lo0019
+|        +--| (100)
+|        |  +--PD37580a_lo0060
+|     +--| (90)
+|     |  +--PD37580a_lo0034
+|  +--| (75)
+|  |  +--PD37580a_lo0049
++--| (62)
+   +--PD37580a_lo0063
+
+
+Consensus tree in newick format: 
+
+(Ancestral,(((PD37580a_lo0016,PD37580a_lo0006)100,PD37580a_lo0048)100,(PD37580a_lo0065,PD37580a_lo0091)56)56,((((PD37580a_lo0019,PD37580a_lo0060)100,PD37580a_lo0034)90,PD37580a_lo0049)75,PD37580a_lo0063)62);
+
+TIME STAMP
+----------
+
+Date and time: Mon Mar  6 14:23:12 2023
+Total CPU time used: 8.51867 seconds (0h:0m:8s)
+Total wall-clock time used: 8.78783 seconds (0h:0m:8s)
+

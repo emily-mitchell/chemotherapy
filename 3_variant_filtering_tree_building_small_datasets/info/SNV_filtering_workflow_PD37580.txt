@@ -1,0 +1,131 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# "ms44 filters for PD37580 3"
+# Author: Emily Mitchell
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------
+------------------------------------------------------------------------------------------
+# 1a. Run script for filtering caveman output from low input pipeline see below
+	farm3 login
+        /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Lists of sample and project names created in excel ms44_filter_set_up
+# Run on cgpbar using nohup &
+#-pt: Comma-separated list of project identifiers containing the samples of interest
+#-st: Comma-separated list of sample identifiers whose presence is required in the matched project directories listed under –pt
+#-pn: Comma-separated list of project identifiers containing the matched control samples
+#-sn: Comma-separated list of sample identifiers of control samples whose presence is required in the matched project directories listed under -pn
+#-o: Output directory
+
+# See other options /lustre/scratch116/casm/cgp/users/ms44/scripts/runLCMFiltering_by_sample_project.sh --help (assume data aligned to hg19)
+# If coverage low (~15) might be best to lower the variant fragment threshold to 3 through the parameter -f (default:4).
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Run lcm filtering 
+/lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+module load samtools
+
+python /lustre/scratch126/casm/team273jn/share/runlcmfilter_multi_nst.py --project 2919 --samples PD37580a_lo0063,PD37580a_lo0034,PD37580a_lo0006,PD37580a_lo0016,PD37580a_lo0048,PD37580a_lo0019,PD37580a_lo0060,PD37580a_lo0091,PD37580a_lo0049,PD37580a_lo0065 --outdir /lustre/scratch126/casm/team154pc/em16/PX007/PX007_1/subs/ --build hg19 --fragment_threshold 3
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 2. Check number of lines in the complete_final_retained_3.vcf files
+/lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/filtered_output_3/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+wc -l *complete_final_retained_3.vcf
+
+    39803 PD37580a_lo0006_complete_final_retained_3.vcf
+    40616 PD37580a_lo0016_complete_final_retained_3.vcf
+    41307 PD37580a_lo0019_complete_final_retained_3.vcf
+    40172 PD37580a_lo0034_complete_final_retained_3.vcf
+    40695 PD37580a_lo0048_complete_final_retained_3.vcf
+    43190 PD37580a_lo0049_complete_final_retained_3.vcf
+    41608 PD37580a_lo0060_complete_final_retained_3.vcf
+    40204 PD37580a_lo0063_complete_final_retained_3.vcf
+    43255 PD37580a_lo0065_complete_final_retained_3.vcf
+    43497 PD37580a_lo0091_complete_final_retained_3.vcf
+   414347 total                       
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 3. Get one long bed file of all the subs, copy to new directory, create output file
+
+/lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/filtered_output_3/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+cut -f 1,2,4,5 *complete_final_retained_3.vcf | sort | uniq > PD37580_filtered_subs.bed
+grep -v "#" PD37580_filtered_subs.bed > PD37580_filtered_subs_no#.bed # remove lines starting with "#"
+mv PD37580_filtered_subs_no#.bed PD37580_3_filtered_subs.bed
+
+#117233 PD37580_3_filtered_subs.bed
+
+mkdir output
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 4. Run cgpVAF script to create cgpVAF commands that are split per chromosome
+        On cgp-farm
+        /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/filtered_output_3/
+        Creates: cgpVafChr.cmd (commands split per chr) cgpVafConcat.cmd (commands to concatenate split output) run_bsub.sh (script to set off commands in first two files)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+module load cgpVAFcommand
+
+createVafCmd.pl -pid 2919 -u PD37580a_lo0063 PD37580a_lo0034 PD37580a_lo0006 PD37580a_lo0016 PD37580a_lo0048 PD37580a_lo0019 PD37580a_lo0060 PD37580a_lo0091 PD37580a_lo0049 PD37580a_lo0065 -o output -g /lustre/scratch119/casm/team78pipelines/reference/human/GRCh37d5/genome.fa -hdr /lustre/scratch119/casm/team78pipelines/reference/human/GRCh37d5/shared/ucscHiDepth_0.01_mrg1000_no_exon_coreChrs.bed.gz -mq 30  -bo 1  -b PD37580_3_filtered_subs.bed
+                                               
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 5. Edit run_bsub.sh command to increase memory and use long queue
+            run_bsub.sh command sets off jobs in cgpVafChr.cmd file that has been created
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+No need to do this
+                                
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 6. Run run_bsub.sh command
+	/lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/filtered_output_3/
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bash run_bsub.sh
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 7. Check output /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/filtered_output_3/output/output/PDv37is/snp
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+PDv37is_PD37580a_lo0016_snp_vaf.tsv  PDv37is_PD37580a_lo0016_snp_vaf.vcf.gz
+PDv37is_PD37580a_lo0016_snp_vaf.vcf  PDv37is_PD37580a_lo0016_snp_vaf.vcf.gz.tbi
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 8.  Remove extra lines in headers of vaf.tsv files with more than 10 bam files
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Ensure headers are the same length
+wc -l *_vaf.tsv
+
+# 117292 PDv37is_PD37580a_lo0016_snp_vaf.tsv
+
+grep -v "##" PDv37is_PD37580a_lo0016_snp_vaf.tsv > tsv1
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 9. Cut columns of interest to new files: Chrom Pos Ref Alt then MTR DEP for all samples
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+cut -f 3,4,5,6,39,41,54,56,69,71,84,86,99,101,114,116,129,131,144,146,159,161,174,176 tsv1 > PD37580_filtered_3_merged_cut.tsv   #Chr, Pos, Ref, Alt, + MTR, DEP for all samples (max 11)
+
+#117234 PD37580_filtered_3_merged_cut.tsv
+
+#Copy file to local drive
+
+scp -r farm5-login:/lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/filtered_output_3/output/output/PDv37is/snp/PD37580_filtered_3_merged_cut.tsv /Users/em16/Documents/PhD/Sequencing_results/Mutographs/Alkylating_agents_2178/PD37580/subs/
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Continue analysis using PD37580_analysis.R (once indel filtering also complete)
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+

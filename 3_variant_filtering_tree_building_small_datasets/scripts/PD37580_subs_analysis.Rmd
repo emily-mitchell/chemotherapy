@@ -1,0 +1,164 @@
+---
+title: "Subs Analysis"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+
+PDID = "PD37580" #enter PDID
+number_samples = "10" #enter number of samples for this individual
+gender = "female"  #gender of individual 
+project = "Alkylating_agents_2178"
+
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = paste0("~/Documents/PhD/Sequencing_results/Mutographs/",project,"/",PDID,"/subs/"))
+```
+
+Open libraries
+```{r}
+library(GenomicRanges)
+library(dplyr)
+library(tidyr)
+```
+
+1. Read in merged_cut.tsv file
+```{r}
+merged <- read.csv(paste0("~/Documents/PhD/Sequencing_results/Mutographs/",project,"/",PDID,"/subs/data/",PDID, "_filtered_merged_cut.tsv"), sep="\t", header= T, stringsAsFactors=F)
+
+```
+
+2. Generate list of column names containing "MTR" and list of sample IDs
+```{r}
+mtrs <- grep("MTR", colnames(merged), value=T) #gives list of column names containing "MTR"
+samps <- gsub("_MTR", "", mtrs)
+```
+
+3. Count number of samples with mtrs
+```{r}
+merged$count <- apply(merged[,mtrs], 1, function(row) length(which(row>0))) #apply returns list of values obtained by applying function to 1(rows) - length of vector counting mtrs > 0
+```
+
+4. Identify likely germline variants
+```{r}
+merged$germline <- "som"  #create column called germline - filled with 'som' as default
+merged$germline[merged$count>(length(mtrs)/2)] <- "germ"  # removes subs present in more than 1/2 samples from an individual
+table(merged$germline == "som") 
+merged_clean <- merged[merged$germline=="som",1:(ncol(merged)-2)]
+```
+
+
+5. Call mutations on at least 2 reads and a vaf >=0.2
+```{r}
+tmtrs <- merged_clean[,grep("MTR", colnames(merged_clean), value=T)]
+tdeps <- merged_clean[,grep("DEP", colnames(merged_clean), value=T)]
+tvafs <- tmtrs/tdeps
+colnames(tvafs) <- gsub("_MTR", "", colnames(tvafs))
+tcalls <- tmtrs
+Muts <- paste(merged_clean$Chrom, merged_clean$Pos, merged_clean$Ref, merged_clean$Alt,sep="_")
+rownames(tmtrs)=rownames(tdeps)=rownames(tvafs)=rownames(tcalls)=Muts
+
+# mtr cutoff
+tcalls[tmtrs>=2] <- 1
+tcalls[tmtrs<2] <- 0
+  
+# vaf cutoff
+tcalls[tvafs<=0.2] <- 0
+colnames(tcalls) <- gsub("_MTR", "", colnames(tcalls))
+
+XY_chromosomal=grepl("X|Y",rownames(tdeps))
+autosomal=!XY_chromosomal
+
+if(gender=="female"){
+  tcalls[rowMeans(tdeps)<8&rowMeans(tdeps)>50] <- 0 
+  }#use if female
+
+if(gender=="male"){
+tcalls[rowMeans(tdeps)<8&rowMeans(tdeps)>50&autosomal|rowMeans(tdeps)<4&rowMeans(tdeps)>25&XY_chromosomal] <- 0 
+}#use if male
+
+# bind back on the chrom pos ref alt info
+tcalls <- as.data.frame(cbind(merged_clean[,c("Chrom", "Pos", "Ref", "Alt")], tcalls))
+tdeps <- as.data.frame(cbind(merged_clean[,c("Chrom", "Pos", "Ref", "Alt")], tdeps))
+tcalls_flt <- tcalls[(rowSums(tcalls[5:ncol(tcalls)])>0),]
+tdeps_flt <- tdeps[(rowSums(tcalls[5:ncol(tcalls)])>0),]
+  
+
+```
+
+
+6. Sum columns for each sample and calculate mean depth for each sample
+```{r}
+tsubsums <- as.data.frame(colSums(tcalls_flt[,grep("PD", colnames(tcalls_flt))]))
+tmeandep <- as.data.frame((colSums(tdeps_flt[grep("PD", colnames(tdeps_flt))]))/(nrow(tdeps_flt)))
+
+#create column with sample names  
+tsubsums$Sample <- rownames(tsubsums)
+colnames(tsubsums)[1] <- "Number_mutations"  #Name column with number of indels "Indels"
+colnames(tmeandep)[1] <- "Mean_depth"
+tsummary <- as.data.frame(cbind(tmeandep[,c("Mean_depth")], tsubsums))
+tsum <- as.data.frame(cbind(tsummary[,c(3,2,1)]))
+colnames(tsum)[3] <- "Mean_depth"
+
+write.table(tsum, paste0("~/Documents/PhD/Sequencing_results/Mutographs/",project,"/",PDID,"/subs/mutation_burden/",PDID,"_sub_dep.txt"), sep="\t", col.names = T, row.names = F, quote=F)
+ 
+```
+
+
+
+7. Graph of VAF distribution per sample
+    - using unfiltered cgpVAF output (merged), allows assessment of contamination from another individual
+```{r}
+xmtrs <- merged[,grep("MTR", colnames(merged), value=T)]
+xdeps <- merged[,grep("DEP", colnames(merged), value=T)]
+xvafs <- xmtrs/xdeps
+colnames(xvafs) <- gsub("_MTR", "", colnames(xvafs))
+
+#Create list of samples to loop through
+
+samples <- grep("PD", colnames(xvafs), value=T)
+
+
+  
+for (sample in samples[1:number_samples]) {
+  raw_vafs <- xvafs[,sample]
+  pos_vafs <- raw_vafs[raw_vafs>0 & !is.na(raw_vafs)]
+  hist(pos_vafs, main = paste0(sample, " histogram of all variants"), breaks = 20)
+  
+    pdf(paste0("~/Documents/PhD/Sequencing_results/Mutographs/",project,"/",PDID,"/subs/vaf_plots/",sample, "_VAF_dist_all.pdf"))
+ hist(pos_vafs, main = paste0(sample, " histogram of all variants"), breaks = 20)
+    dev.off()
+}
+
+```
+
+
+7. Graph of VAF distribution per sample
+    - using filtered cgpVAF output (merged_clean), allows identification of non-clonal samples 
+```{r}
+xmtrs <- merged_clean[,grep("MTR", colnames(merged_clean), value=T)]
+xdeps <- merged_clean[,grep("DEP", colnames(merged_clean), value=T)]
+xvafs <- xmtrs/xdeps
+colnames(xvafs) <- gsub("_MTR", "", colnames(xvafs))
+
+#Create list of samples to loop through
+
+samples <- grep("PD", colnames(xvafs), value=T)
+
+
+
+for (sample in samples[1:number_samples]) {
+  raw_vafs <- xvafs[,sample]
+  pos_vafs <- raw_vafs[raw_vafs>0 & !is.na(raw_vafs)]
+  hist(pos_vafs, main = paste0(sample, " histogram of somatic variants"), breaks =20)
+  
+  pdf(paste0("~/Documents/PhD/Sequencing_results/Mutographs/",project,"/",PDID,"/subs/vaf_plots/",sample, "_VAF_dist_somatic.pdf"))
+  hist(pos_vafs, main = paste0(sample, " histogram of somatic variants"), breaks =20)  
+ dev.off()
+ 
+}
+
+
+```
+

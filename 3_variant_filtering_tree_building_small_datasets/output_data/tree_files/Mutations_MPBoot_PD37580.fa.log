@@ -1,0 +1,98 @@
+MPBoot version 1.1.0 for Linux 64-bit built Mar 23 2018
+Copyright (c) 2016 Diep Thi Hoang, Le Sy Vinh, Tomas Flouri, Alexandros Stamatakis, Arndt von Haeseler and Bui Quang Minh.
+
+WARNING: Your CPU supports AVX but you are using SSE3 version of MPBoot!
+WARNING: Please switch to AVX version that is 40% faster than SSE3.
+
+Host:    node-14-10 (AVX2, FMA3, 2163 GB RAM)
+Command: /lustre/scratch117/casm/team154/tc16/Programs/mpboot-sse-1.1.0-Linux/bin/mpboot -s /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/analysis/tree_files/Mutations_MPBoot_PD37580.fa -bb 1000
+Seed:    701204 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Mon Mar  6 14:23:03 2023
+Kernel:  SSE3
+
+Reading alignment file /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/analysis/tree_files/Mutations_MPBoot_PD37580.fa ... Fasta format detected
+Alignment most likely contains DNA/RNA sequences
+Alignment has 11 sequences with 8507 columns and 180 patterns
+ID   Sequence         #Gap/Ambiguity
+1    Ancestral        0    (0.000%)	4
+2    PD37580a_lo0016  0    (0.000%)	4
+3    PD37580a_lo0019  0    (0.000%)	4
+4    PD37580a_lo0034  0    (0.000%)	4
+5    PD37580a_lo0048  0    (0.000%)	4
+6    PD37580a_lo0049  0    (0.000%)	4
+7    PD37580a_lo0006  0    (0.000%)	4
+8    PD37580a_lo0060  0    (0.000%)	4
+9    PD37580a_lo0063  0    (0.000%)	4
+10   PD37580a_lo0065  0    (0.000%)	4
+11   PD37580a_lo0091  0    (0.000%)	4
+**** TOTAL            0 (0.000%)
+Time for parsimony tree construction: 0.000 seconds
+Parsimony score: 8722
+Reordering patterns in alignment by decreasing order of pattern parsimony... 0.000 seconds
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 0.001 seconds
+Generating 1000 samples for bootstrap approximation...
+
+NOTE: 0.309 MB RAM is required!
+Current best tree score: 8719
+
+Generating 99 parsimony trees... (99 duplicated parsimony trees)
+CPU time: 0
+Finish initializing candidate tree set. Number of distinct locally optimal trees: 1
+Current best score: 8719 / CPU time: 0
+
+Time: 0h:0m:0s
+NOTE: REPS computation is segmented into 2 parts for speed...
+segment#1 ends at 8
+segment#2 ends at 180
+0 seconds.
+RATCHET Iteration 10 / Score: 8719 / Time: 0h:0m:0s
+RATCHET Iteration 20 / Score: 8719 / Time: 0h:0m:1s (0h:0m:4s left)
+RATCHET Iteration 30 / Score: 8719 / Time: 0h:0m:1s (0h:0m:3s left)
+RATCHET Iteration 40 / Score: 8719 / Time: 0h:0m:1s (0h:0m:2s left)
+RATCHET Iteration 50 / Score: 8719 / Time: 0h:0m:2s (0h:0m:2s left)
+RATCHET Iteration 60 / Score: 8719 / Time: 0h:0m:2s (0h:0m:1s left)
+RATCHET Iteration 70 / Score: 8719 / Time: 0h:0m:2s (0h:0m:1s left)
+RATCHET Iteration 80 / Score: 8719 / Time: 0h:0m:3s (0h:0m:0s left)
+RATCHET Iteration 90 / Score: 8719 / Time: 0h:0m:3s (0h:0m:0s left)
+RATCHET Iteration 100 / Score: 8719 / Time: 0h:0m:3s (0h:0m:0s left)
+Optimizing bootstrap trees ...
+100 replicates done
+200 replicates done
+300 replicates done
+400 replicates done
+500 replicates done
+600 replicates done
+700 replicates done
+800 replicates done
+900 replicates done
+1000 replicates done
+CPU Time used:  5 sec.
+NOTE: At the end, 3912 bootstrap candidate trees evaluated.
+Scores of best 5 trees: 
+8719 
+BEST SCORE FOUND : 8719
+Creating bootstrap support values...
+Split supports printed to NEXUS file /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/analysis/tree_files/Mutations_MPBoot_PD37580.fa.splits.nex
+
+CPU time used for tree search: 8.410 sec (0h:0m:8s)
+Wall-clock time used for tree search: 8.664 sec (0h:0m:8s)
+Total CPU time used: 8.519 sec (0h:0m:8s)
+Total wall-clock time used: 8.782 sec (0h:0m:8s)
+
+Computing bootstrap consensus tree...
+Reading input file /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/analysis/tree_files/Mutations_MPBoot_PD37580.fa.splits.nex...
+11 taxa and 65 splits.
+Consensus tree written to /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/analysis/tree_files/Mutations_MPBoot_PD37580.fa.contree
+Parsimony score of consensus tree: 8719
+
+Analysis results written to: 
+  MPBoot report:                 /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/analysis/tree_files/Mutations_MPBoot_PD37580.fa.mpboot
+  Maximum-parsimony  tree:       /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/analysis/tree_files/Mutations_MPBoot_PD37580.fa.treefile
+
+Maximum parsimony bootstrap approximation results written to:
+  Split support values:          /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/analysis/tree_files/Mutations_MPBoot_PD37580.fa.splits.nex
+  Consensus tree:                /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/analysis/tree_files/Mutations_MPBoot_PD37580.fa.contree
+  Screen log file:               /lustre/scratch126/casm/team154pc/em16/Mutographs/ALK/PD37580/analysis/tree_files/Mutations_MPBoot_PD37580.fa.log
+
+Date and Time: Mon Mar  6 14:23:12 2023
