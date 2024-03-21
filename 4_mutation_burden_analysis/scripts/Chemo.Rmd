@@ -1,0 +1,177 @@
+---
+title: "Summary_telomere_mutation"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(lme4)
+library(ggplot2)
+library(dplyr)
+library(RColorBrewer)
+```
+
+Read in tables
+```{r}
+setwd("~/Documents/PhD/Sequencing_results/Mutographs/XX_Signatures/Normal_10/mutation/")
+key_table <- read.csv("Chemo_patients.csv", header= T, stringsAsFactors=F)
+
+patients <- key_table$PDID
+
+muts <- read.table(paste0(patients[1],"_mut_dep.txt"), header = T, stringsAsFactors=F)
+for (i in 2:length(patients)){
+      muts_to_add <- read.table(paste0(patients[i],"_mut_dep.txt"), header = T, stringsAsFactors=F)
+      muts <- rbind(muts, muts_to_add)
+}
+
+muts$PDID = substr(muts$Sample,1,7)
+
+Summary_All <- left_join(muts, key_table, by = "PDID")
+
+binomial <- read.csv("adapted_vs_binomial.csv", header= T, stringsAsFactors=F)
+
+timepoints <- read.csv("PD47703_timepoints.csv", header= T, stringsAsFactors=F)
+
+```
+
+```{r}
+Summary_All$Exposure <- factor(Summary_All$Exposure, levels = c("Normal", "Chemo"))
+Summary_All$Bifunctional_alkylating_agent <- factor(Summary_All$Bifunctional_alkylating_agent, levels = c("Cyclophosphamide", "Melphalan and Cyclophosphamide", "Bendamustine","Chlorambucil and Bendamustine","Chlorambucil", "None", "Normal"))
+Summary_All$Monofunctional_alkylating_agent <- factor(Summary_All$Monofunctional_alkylating_agent, levels = c("Procarbazine","None","Normal"))
+Summary_All$Platinum <- factor(Summary_All$Platinum, levels = c("Oxaliplatin","Carboplatin","Carboplatin and Cisplatin", "None","Normal"))
+Summary_All$Antimetabolite <- factor(Summary_All$Antimetabolite, levels = c("5FU","Capecitabine","5FU and Capecitabine","Cytarabine", "None", "Normal"))
+Summary_All$Topo_inhibitor <- factor(Summary_All$Topo_inhibitor, levels = c("Daunorubicin","Doxorubicin","Etoposide","Irinotecan", "None","Normal"))
+Summary_All$Vinca_alkaloid <- factor(Summary_All$Vinca_alkaloid, levels = c("Vincristine","Vinorelbine and Vinblastine", "None","Normal"))
+Summary_All$Cancer_diagnosis <- factor(Summary_All$Cancer_diagnosis, levels = c("AML","Follicular lymphoma","Marginal zone lymphoma", "Lymphoplasmacytic lymphoma", "DLBCL", "Myeloma and Colon cancer", "Hodgkin lymphoma", "Colon cancer", "Lung cancer", "Neuroblastoma", "Normal"))
+Summary_All$Years_post_chemo <- factor(Summary_All$Years_post_chemo, levels = c(0,1,2,4,5,6, "None"))
+Summary_All$Chemo_class <- factor(Summary_All$Chemo_class, levels = c("Cyclophosphamide","Bendamustine", "Melphalan_cyclophosphamide_oxaliplatin","Chlorambucil","Chlorambucil_procarbazine_bendamustine","Cyclophosphamide_procarbazine","Oxaliplatin","Carboplatin","Carboplatin_cisplatin_cyclophosphamide","None","Normal"))
+Summary_All$Years_post_chemo <- factor(Summary_All$Years_post_chemo, levels = c(0,1,2,4,5,6, "None"))
+
+```
+
+Comparison of depth of sequencing between normals and chemotherapy exposed
+```{r}
+ggplot(Summary_All)+
+  theme_bw()+
+  scale_colour_manual(values = c(brewer.pal(11,"RdBu")[c(10,8)]))+
+  ylim(0,50)+
+    theme(text=element_text(size=22))+
+    geom_boxplot(data = (Summary_All), aes(group = Exposure, x = Exposure, y =Mean_depth, colour = Exposure))
+```
+
+Comparison of depth of sequencing by diagnosis
+```{r}
+ggplot(Summary_All)+
+  theme_bw()+
+  theme(text=element_text(size=22))+
+    theme(axis.text.x=element_blank())+
+  scale_colour_manual(values = c(brewer.pal(12,"Paired")[c(7,8,8,8,5,6,12,4,10,2,3)]))+
+  ylim(0,50)+
+    geom_boxplot(data = (Summary_All), aes(group = Cancer_diagnosis, x = Cancer_diagnosis, y =Mean_depth, colour = Cancer_diagnosis))
+```
+
+Comparison of depth of sequencing by chemotherapy exposure
+```{r}
+ggplot(Summary_All)+
+  theme_bw()+
+  theme(text=element_text(size=5))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  ylim(0,50)+
+    geom_boxplot(data = (Summary_All), aes( x = Chemo_class, y =Mean_depth))
+```
+
+
+Comparison of adapted vs binomial filtering approach
+- binomial filtering approach
+```{r}
+ggplot(binomial)+
+  theme_bw()+
+  theme(text=element_text(size=22))+
+    theme(axis.text.x=element_blank())+
+  geom_smooth(data = (binomial), method = "lm",aes(x = Age, y =Number_mutations_binomial), size = 0.5)+
+  #scale_colour_manual(values = c(brewer.pal(12,"Paired")[c(7,8,5,6,12,4,10,2)]))+
+  ylim(0,2000)+
+    geom_boxplot(data = (binomial), aes(group = Age, x = Age, y =Number_mutations_binomial))
+```
+
+- adapted filtering approach
+```{r}
+ggplot(binomial)+
+  theme_bw()+
+  theme(text=element_text(size=22))+
+    theme(axis.text.x=element_blank())+
+    geom_smooth(data = (binomial), method = "lm",aes(x = Age, y =Number_mutations), size = 0.5)+
+  #scale_colour_manual(values = c(brewer.pal(12,"Paired")[c(7,8,5,6,12,4,10,2)]))+
+  ylim(0,2000)+
+    geom_boxplot(data = (binomial), aes(group = Age, x = Age, y =Number_mutations))
+```
+
+
+SBS analysis - high burden cases only
+
+```{r}
+ggplot(Summary_All)+
+  theme_bw()+
+  labs(x="Age", y="SBS burden")+
+  scale_x_continuous(limits = c(-5,90), breaks = c(0,20,40,60,80))+
+  scale_y_continuous(limits = c(0,10000), breaks = c(1000,2000,3000,4000,5000,6000,7000,8000,9000,10000))+
+   stat_smooth(data = (Summary_All[Summary_All$Exposure == "Normal",]), method = "lm",aes(x = Age, y =Number_mutations), size = 0.5, fullrange= TRUE)+
+  scale_colour_manual(values = c(brewer.pal(12,"Paired")[c(2,6)]))+
+    theme(text=element_text(size=18))+
+     geom_boxplot(data = (Summary_All[Summary_All$Cancer_diagnosis %in% c("AML","Hodgkin lymphoma", "Neuroblastoma", "Normal"),]),aes(group = PDID, x = Age, y =Number_mutations), outlier.alpha = 0)+
+     geom_point(data = (Summary_All[Summary_All$Cancer_diagnosis %in% c("AML","Hodgkin lymphoma", "Neuroblastoma", "Normal"),]), position = position_dodge(width = 0.75),  aes(group = PDID, x = Age, y =Number_mutations, colour = Exposure))
+
+```
+
+
+SBS analysis - Low burden cases only
+
+```{r}
+ggplot(Summary_All)+
+  theme_bw()+
+  labs(x="Age", y="SBS burden")+
+  scale_x_continuous(limits = c(35,85), breaks = c(40,60,80))+
+  scale_y_continuous(limits = c(0,2000), breaks = c(200,400,600,800,1000,1200,1400,1600,1800,2000))+
+  stat_smooth(data = (Summary_All[Summary_All$Exposure == "Normal",]), method = "lm",aes(x = Age, y =Number_mutations), size = 0.5, fullrange= TRUE)+
+  scale_colour_manual(values = c(brewer.pal(12,"Paired")[c(2,6)]))+
+    theme(text=element_text(size=18))+
+         geom_boxplot(data = (Summary_All[Summary_All$Cancer_diagnosis %in% c("Follicular lymphoma","Marginal zone lymphoma", "Lymphoplasmacytic lymphoma", "DLBCL", "Myeloma and Colon cancer", "Colon cancer", "Lung cancer", "Normal"),]), aes(group = PDID, x = Age, y =Number_mutations), outlier.alpha = 0)+
+      geom_point(data = (Summary_All[Summary_All$Cancer_diagnosis %in% c("Follicular lymphoma","Marginal zone lymphoma", "Lymphoplasmacytic lymphoma", "DLBCL", "Myeloma and Colon cancer", "Colon cancer", "Lung cancer", "Normal"),]), position = position_dodge(width = 0.75), aes(group = PDID, x = Age, y =Number_mutations, colour = Exposure))
+
+```
+
+
+Indel analysis - high burden cases only
+
+```{r}
+ggplot(Summary_All)+
+  theme_bw()+
+  labs(x="Age", y="Indel burden")+
+  scale_x_continuous(limits = c(-5,90), breaks = c(0,20,40,60,80))+
+  scale_y_continuous(limits = c(0,200), breaks = c(0,20,40,60,80,100,120,140,160,180,200))+
+  theme(text=element_text(size=18))+
+   stat_smooth(data = (Summary_All[Summary_All$Exposure == "Normal",]), method = "lm",aes(x = Age, y =Number_indels), size = 0.5, fullrange= TRUE)+
+  scale_colour_manual(values = c(brewer.pal(12,"Paired")[c(2,6)]))+
+   geom_boxplot(data = (Summary_All[Summary_All$Cancer_diagnosis %in% c("AML","Hodgkin lymphoma", "Neuroblastoma", "Normal"),]),aes(group = PDID, x = Age, y =Number_indels), outlier.alpha = 0)+
+     geom_point(data = (Summary_All[Summary_All$Cancer_diagnosis %in% c("AML","Hodgkin lymphoma", "Neuroblastoma", "Normal"),]), position = position_dodge(width = 0.75),  aes(group = PDID, x = Age, y =Number_indels, colour = Exposure))
+```
+
+
+Indel analysis - low burden cases only
+
+```{r}
+ggplot(Summary_All)+
+  theme_bw()+
+  labs(x="Age", y="Indel burden")+
+  scale_x_continuous(limits = c(35,85), breaks = c(40,60,80))+
+  scale_y_continuous(limits = c(0,120), breaks = c(0,20,40,60,80,100,120))+
+  theme(text=element_text(size=18))+
+   stat_smooth(data = (Summary_All[Summary_All$Exposure == "Normal",]), method = "lm",aes(x = Age, y =Number_indels), size = 0.5, fullrange= TRUE)+
+  scale_colour_manual(values = c(brewer.pal(12,"Paired")[c(2,6)]))+
+   geom_boxplot(data = (Summary_All[Summary_All$Cancer_diagnosis %in% c("Follicular lymphoma","Marginal zone lymphoma", "Lymphoplasmacytic lymphoma", "DLBCL", "Myeloma and Colon cancer", "Colon cancer", "Lung cancer", "Normal"),]), aes(group = PDID, x = Age, y =Number_indels), outlier.alpha = 0)+
+      geom_point(data = (Summary_All[Summary_All$Cancer_diagnosis %in% c("Follicular lymphoma","Marginal zone lymphoma", "Lymphoplasmacytic lymphoma", "DLBCL", "Myeloma and Colon cancer", "Colon cancer", "Lung cancer", "Normal"),]), position = position_dodge(width = 0.75), aes(group = PDID, x = Age, y =Number_indels, colour = Exposure))
+
+```
+
