@@ -1,0 +1,12 @@
+donor_id	Status	CN_number	Copy_neutral_LOH_fraction
+PD50308 (27F)	Chemotherapy	0	0
+PD40521 (29M)	Normal	0	0
+PD50307 (40F)	Chemotherapy	0	0
+PD37580 (43F)	Chemotherapy	0	0
+PD41048 (48M)	Normal	0	0
+PD47703 (48F)	Chemotherapy	3	0.015
+PD49237 (60F)	Normal	0	0
+PD47537 (61F)	Chemotherapy	1	0.022727273
+PD49236 (63M)	Normal	1	0.005780347
+PD44579 (63F)	Chemotherapy	1	0.005780347
+PD45534 (77F)	Normal	2	0.01

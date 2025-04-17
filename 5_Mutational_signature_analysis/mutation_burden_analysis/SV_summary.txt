@@ -1,0 +1,12 @@
+donor_id	Status	SV_number	Deletion_Fraction	Duplication_Fraction	Inversion_Fraction	Translocation_Fraction
+PD50308 (27F)	Chemotherapy	3	0.073170732	0	0	0
+PD40521 (29M)	Normal	0	0	0	0	0
+PD50307 (40F)	Chemotherapy	2	0.024390244	0	0.024390244	0
+PD37580 (43F)	Chemotherapy	0	0	0	0	0
+PD41048 (48M)	Normal	1	0	0.005	0	0
+PD47703 (48F)	Chemotherapy	16	0.045	0	0.025	0.01
+PD49237 (60F)	Normal	3	0.068181818	0	0	0
+PD47537 (61F)	Chemotherapy	0	0	0	0	0
+PD49236 (63M)	Normal	11	0.046242775	0.011560694	0	0.005780347
+PD44579 (63F)	Chemotherapy	6	0.011560694	0.005780347	0.01734104	0
+PD45534 (77F)	Normal	7	0.01	0.01	0.01	0.005
